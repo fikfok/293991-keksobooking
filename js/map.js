@@ -92,7 +92,7 @@ function Ads() {
       array.push(getAnyElementFisher(arrayOfElements));
     }
     return array;
-  };
+  }
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -180,6 +180,6 @@ for (i = 0; i < 8; i++) {
 }
 
 var pinMap = document.querySelector('.tokyo__pin-map');
-pinMap.appendChild(fragment)
+pinMap.appendChild(fragment);
 
 
