@@ -21,7 +21,7 @@ var generateAvatarImgPath = function (numberOfElements) {
  * @return {*}
  */
 var getAnyElementFisher = function (arrayOfElements) {
-  if (arrayOfElements.counter === arrayOfElements.values.length - 1) {
+  if (arrayOfElements.counter === arrayOfElements.values.length) {
     arrayOfElements.counter = 0;
   }
   var elementPosition = getRandomNumber(arrayOfElements.values.length - 1, arrayOfElements.counter);
@@ -77,8 +77,8 @@ var getRusLodgeType = function (offerTypeEn) {
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // Переменные
 var pinSize = {
-  width: 40,
-  height: 40
+  width: 56,
+  height: 75
 };
 
 var array = [];
@@ -105,56 +105,52 @@ var additionalFeatures = {
   values: ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
   counter: 0
 };
-
-var location = {
-  x: getRandomNumber(900, 300),
-  y: getRandomNumber(500, 100)
-};
-
-var offer = {
-  title: getAnyElementFisher(offerTitles),
-  address: location.x + ', ' + location.y,
-  price: getRandomNumber(1000000, 1000),
-  type: getAnyElement(flatTypes.en),
-  rooms: getRandomNumber(5, 1),
-  checkin: getAnyElement(checkInOutTimes),
-  checkout: getAnyElement(checkInOutTimes),
-  features: getFeaturesArray(additionalFeatures)
-};
-
-var singleAd = {
-  author: {avatar: getAnyElementFisher(userAvatarPaths)},
-  offer: offer,
-  location: location,
-  description: '',
-  photos: []
-};
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 var i = 0;
 var arrayOfAds = [];
 var fragment = document.createDocumentFragment();
 var templateOffer = document.getElementById('lodge-template').content;
+var locationX = 0;
+var locationY = 0;
+var roomsNumber = 0;
 
 for (i = 0; i < 8; i++) {
   // Генерация массива объявляений
-  arrayOfAds.push(singleAd);
-  arrayOfAds[i].offer.guests = arrayOfAds[i].offer.guests * getRandomNumber(3, 1);
 
-  console.log(arrayOfAds[i]);
+  locationX = getRandomNumber(900, 300);
+  locationY = getRandomNumber(500, 100);
+  roomsNumber = getRandomNumber(5, 1);
 
-/*
+  arrayOfAds.push({
+    author: {avatar: getAnyElementFisher(userAvatarPaths)},
+    offer: {
+      title: getAnyElementFisher(offerTitles),
+      address: locationX + ', ' + locationY,
+      price: getRandomNumber(1000000, 1000),
+      type: getAnyElement(flatTypes.en),
+      rooms: roomsNumber,
+      guests: roomsNumber * getRandomNumber(3, 1),
+      checkin: getAnyElement(checkInOutTimes),
+      checkout: getAnyElement(checkInOutTimes),
+      features: getFeaturesArray(additionalFeatures)
+    },
+    location: {x: locationX, y: locationY},
+    description: '',
+    photos: []
+  });
+
   // Создание div-блока для нового флажка
   var newDiv = document.createElement('div');
   newDiv.className = 'pin';
   newDiv.setAttribute('style', 'left: ' + (arrayOfAds[i].location.x + pinSize.width / 2) + 'px; top: ' + (arrayOfAds[i].location.y + pinSize.height) + 'px');
 
-  // Создание флажка в div-блоке
+  // Создание pin-флажка в div-блоке
   var newImg = document.createElement('img');
   newImg.className = 'rounded';
   newImg.setAttribute('src', arrayOfAds[i].author.avatar);
-  newImg.setAttribute('width', pinSize.width);
-  newImg.setAttribute('height', pinSize.height);
+  newImg.setAttribute('width', '40');
+  newImg.setAttribute('height', '40');
   newDiv.appendChild(newImg);
 
   // Добавляю новый узел во фрагмент
@@ -169,7 +165,7 @@ for (i = 0; i < 8; i++) {
     newElement.querySelector('.lodge__title').textContent = arrayOfAds[i].offer.title;
     newElement.querySelector('.lodge__address').textContent = arrayOfAds[i].offer.address;
     newElement.querySelector('.lodge__price').innerHTML = arrayOfAds[i].offer.price + '&#x20bd;/ночь';
-    newElement.querySelector('.lodge__type').textContent = arrayOfAds[i].getRusLodgeType(arrayOfAds[i].offer.type);
+    newElement.querySelector('.lodge__type').textContent = getRusLodgeType(arrayOfAds[i].offer.type);
     newElement.querySelector('.lodge__rooms-and-guests').textContent = 'Для ' + arrayOfAds[i].offer.guests + ' гостей в ' + arrayOfAds[i].offer.rooms + ' комнатах';
     newElement.querySelector('.lodge__checkin-time').textContent = 'Заезд после ' + arrayOfAds[i].offer.checkin + ', выезд до ' + arrayOfAds[i].offer.checkout;
     newElement.querySelector('.lodge__description').textContent = arrayOfAds[i].description;
@@ -186,7 +182,7 @@ for (i = 0; i < 8; i++) {
 
     // Меняю аватар в блоке с детальным описанием объявления
     document.getElementById('offer-dialog').querySelector('.dialog__title').querySelector('img').setAttribute('src', arrayOfAds[i].author.avatar);
-  }*/
+  }
 }
 
 var pinMap = document.querySelector('.tokyo__pin-map');
