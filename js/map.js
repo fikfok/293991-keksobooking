@@ -163,7 +163,6 @@ var createArrayOfAds = function (elementsNumberInArray) {
  * Генерирую html-фрагмент, в котором будут отрисовываться пин-флажки и аватарки
  * @param {object} someArray - массив объявлений
  * @param {object} pin - размеры пин-флажка
- * @return {DocumentFragment} - html-фрагмент
  */
 var generateAndShowFragmentOfAds = function (someArray, pin) {
   var someFragment = document.createDocumentFragment();
@@ -173,7 +172,6 @@ var generateAndShowFragmentOfAds = function (someArray, pin) {
   }
   // Отрисовываю сгенерированные объявления на карте
   pinMap.appendChild(someFragment);
-
 };
 
 /**
