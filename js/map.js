@@ -20,14 +20,14 @@ var generateAvatarImgPath = function (numberOfElements) {
  * @param {Object} arrayOfElements - массив, из которого будет возвращён случайный элемент
  * @return {*}
  */
-var getAnyElementFisher = function (arrayOfElements) {
-  if (arrayOfElements.counter === arrayOfElements.values.length) {
-    arrayOfElements.counter = 0;
+var getAnyElementFisher = function (objectOfElements) {
+  if (objectOfElements.counter === objectOfElements.values.length) {
+    objectOfElements.counter = 0;
   }
-  var elementPosition = getRandomNumber(arrayOfElements.values.length - 1, arrayOfElements.counter);
-  var element = arrayOfElements.values[elementPosition];
-  arrayOfElements.values[elementPosition] = arrayOfElements.values.splice(arrayOfElements.counter, 1, arrayOfElements.values[elementPosition])[0];
-  arrayOfElements.counter++;
+  var elementPosition = getRandomNumber(objectOfElements.values.length - 1, objectOfElements.counter);
+  var element = objectOfElements.values[elementPosition];
+  objectOfElements.values[elementPosition] = objectOfElements.values.splice(objectOfElements.counter, 1, objectOfElements.values[elementPosition])[0];
+  objectOfElements.counter++;
   return element;
 };
 
