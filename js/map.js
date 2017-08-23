@@ -17,34 +17,27 @@ var generateAvatarImgPath = function (numberOfElements) {
 
 /**
  * Возвращение случайного элемента из переданного массива. Применяется перестановка Фишера
- * @param {Object} objectOfElements - массив, из которого будет возвращён случайный элемент
+ * @param {Object} arrayOfElements - массив, из которого будет возвращён случайный элемент
+ * @param {boolean} isUnique - признак: использовать перестановку Фишера или нет
+ * @param {integer} startIndex - стартовый элемент массива, с которого будет осуществляться случайный выбор. Используется дл перестановки Фишера
  * @return {*}
  */
-var getAnyElementFisher = function (objectOfElements) {
-  if (objectOfElements.counter === objectOfElements.values.length) {
-    objectOfElements.counter = 0;
+var getAnyElement = function (arrayOfElements, isUnique, startIndex) {
+  var elementPosition = getRandomNumber(arrayOfElements.length - 1, startIndex);
+  var element = arrayOfElements[elementPosition];
+  if (isUnique) {
+    var tmp = arrayOfElements[startIndex];
+    arrayOfElements[startIndex] = element;
+    arrayOfElements[elementPosition] = tmp;
   }
-  var elementPosition = getRandomNumber(objectOfElements.values.length - 1, objectOfElements.counter);
-  var element = objectOfElements.values[elementPosition];
-  objectOfElements.values[elementPosition] = objectOfElements.values.splice(objectOfElements.counter, 1, objectOfElements.values[elementPosition])[0];
-  objectOfElements.counter++;
   return element;
-};
-
-/**
- * Возвращает случайный элемент из переданного массива
- * @param {Object} arrayOfElements - массив
- * @return {*}
- */
-var getAnyElement = function (arrayOfElements) {
-  return arrayOfElements[getRandomNumber(arrayOfElements.length - 1, 0)];
 };
 
 /**
  * Возвращает случайное число из диапазона
  * @param {integer} max - максимальная граница
  * @param {integer} min - минимальная граница
- * @return {number}
+ * @return {number} - случайное число
  */
 var getRandomNumber = function (max, min) {
   return Math.round(Math.random() * (max - min) + min);
@@ -57,9 +50,9 @@ var getRandomNumber = function (max, min) {
 */
 var getFeaturesArray = function (arrayOfElements) {
   array = [];
-  maxNumber = getRandomNumber(arrayOfElements.values.length, 1);
+  maxNumber = getRandomNumber(arrayOfElements.length, 1);
   for (var i = 0; i < maxNumber; i++) {
-    array.push(getAnyElementFisher(arrayOfElements));
+    array.push(getAnyElement(arrayOfElements, true, i));
   }
   return array;
 };
@@ -75,24 +68,25 @@ var getRusLodgeType = function (offerTypeEn) {
 
 /**
  * Возвращает объект-объявление
+ * @param {integer} adNumber - порядковый номер создаваемого объявления. Этот номер используется при выборке Фишера
  * @return {{author: {avatar: *}, offer: {title: *, address: string, price: number, type: *, rooms: number, guests: number, checkin: *, checkout: *, features: Array}, location: {x: number, y: number}, description: string, photos: Array}}
  */
-var createAd = function () {
+var createAd = function (adNumber) {
   var locationX = getRandomNumber(900, 300);
   var locationY = getRandomNumber(500, 100);
   var roomsNumber = getRandomNumber(5, 1);
 
   return {
-    author: {avatar: getAnyElementFisher(userAvatarPaths)},
+    author: {avatar: getAnyElement(userAvatarPaths, true, adNumber)},
     offer: {
-      title: getAnyElementFisher(offerTitles),
+      title: getAnyElement(offerTitles, true, adNumber),
       address: locationX + ', ' + locationY,
       price: getRandomNumber(1000000, 1000),
       type: getAnyElement(flatTypes.en),
       rooms: roomsNumber,
       guests: roomsNumber * getRandomNumber(3, 1),
-      checkin: getAnyElement(checkInOutTimes),
-      checkout: getAnyElement(checkInOutTimes),
+      checkin: getAnyElement(checkInOutTimes, false, 0),
+      checkout: getAnyElement(checkInOutTimes, false, 0),
       features: getFeaturesArray(additionalFeatures)
     },
     location: {x: locationX, y: locationY},
@@ -109,24 +103,18 @@ var createAd = function () {
  */
 var createAnotherDiv = function (singleAd, pin) {
   var newDiv = document.createElement('div');
-  newDiv.className = 'pin';
-  newDiv.setAttribute('style', 'left: ' + (singleAd.location.x + pin.width / 2) + 'px; top: ' + (singleAd.location.y + pin.height) + 'px');
-  newDiv.appendChild(createAnotherPin(singleAd));
-  return newDiv;
-};
+  newDiv.classList.add('pin');
+  newDiv.style.left = (singleAd.location.x + pin.width / 2) + 'px';
+  newDiv.style.top = (singleAd.location.y + pin.height) + 'px';
 
-/**
- * Создание pin-флажка в div-блоке
- * @param {Object} singleAd - экземпляр объявления
- * @return {Element} - флажок-пин, html узел
- */
-var createAnotherPin = function (singleAd) {
   var newPin = document.createElement('img');
-  newPin.className = 'rounded';
-  newPin.setAttribute('src', singleAd.author.avatar);
-  newPin.setAttribute('width', '40');
-  newPin.setAttribute('height', '40');
-  return newPin;
+  newPin.classList.add('rounded');
+  newPin.style.src = singleAd.author.avatar;
+  newPin.style.width = 40;
+  newPin.style.height = 40;
+
+  newDiv.appendChild(newPin);
+  return newDiv;
 };
 
 /**
@@ -141,7 +129,7 @@ var createNodeWithDetailInfo = function (singleAd) {
   // Заполняю блок данными из объявления
   newElement.querySelector('.lodge__title').textContent = singleAd.offer.title;
   newElement.querySelector('.lodge__address').textContent = singleAd.offer.address;
-  newElement.querySelector('.lodge__price').innerHTML = singleAd.offer.price + '&#x20bd;/ночь';
+  newElement.querySelector('.lodge__price').innerHTML = singleAd.offer.price + '&#x20bd;/ночь'; /* Здесь надо применить именно innerHTML, т.к. код символа рубля можно записать только так*/
   newElement.querySelector('.lodge__type').textContent = getRusLodgeType(singleAd.offer.type);
   newElement.querySelector('.lodge__rooms-and-guests').textContent = 'Для ' + singleAd.offer.guests + ' гостей в ' + singleAd.offer.rooms + ' комнатах';
   newElement.querySelector('.lodge__checkin-time').textContent = 'Заезд после ' + singleAd.offer.checkin + ', выезд до ' + singleAd.offer.checkout;
@@ -165,7 +153,7 @@ var createNodeWithDetailInfo = function (singleAd) {
 var createArrayOfAds = function (elementsNumberInArray) {
   var someArray = [];
   for (var i = 0; i < elementsNumberInArray; i++) {
-    someArray.push(createAd());
+    someArray.push(createAd(i));
   }
   return someArray;
 };
@@ -203,7 +191,6 @@ var showAdInDetailedView = function (someArray, numberOfCurrentAd) {
  * @param {object} someFragment - фрагмент
  */
 var showAllAdsOnMap = function (someFragment) {
-  var pinMap = document.querySelector('.tokyo__pin-map');
   pinMap.appendChild(someFragment);
 };
 
@@ -219,15 +206,9 @@ var pinSize = {
 var array = [];
 var maxNumber = 0;
 
-var userAvatarPaths = {
-  values: generateAvatarImgPath(8),
-  counter: 0
-};
+var userAvatarPaths = generateAvatarImgPath(8);
 
-var offerTitles = {
-  values: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'],
-  counter: 0
-};
+var offerTitles = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
 
 var flatTypes = {
   en: ['flat', 'house', 'bungalo'],
@@ -236,13 +217,11 @@ var flatTypes = {
 
 var checkInOutTimes = ['12:00', '13:00', '14:00'];
 
-var additionalFeatures = {
-  values: ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
-  counter: 0
-};
+var additionalFeatures = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 var adsNumber = 8;
+var pinMap = document.querySelector('.tokyo__pin-map');
 
 // Генерация массива объявляений
 var arrayOfAds = createArrayOfAds(adsNumber);
