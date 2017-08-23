@@ -17,7 +17,7 @@ var generateAvatarImgPath = function (numberOfElements) {
 
 /**
  * Возвращение случайного элемента из переданного массива. Применяется перестановка Фишера
- * @param {Object} arrayOfElements - массив, из которого будет возвращён случайный элемент
+ * @param {Object} objectOfElements - массив, из которого будет возвращён случайный элемент
  * @return {*}
  */
 var getAnyElementFisher = function (objectOfElements) {
@@ -77,10 +77,10 @@ var getRusLodgeType = function (offerTypeEn) {
  * Возвращает объект-объявление
  * @return {{author: {avatar: *}, offer: {title: *, address: string, price: number, type: *, rooms: number, guests: number, checkin: *, checkout: *, features: Array}, location: {x: number, y: number}, description: string, photos: Array}}
  */
-var addCreateAd = function () {
-  locationX = getRandomNumber(900, 300);
-  locationY = getRandomNumber(500, 100);
-  roomsNumber = getRandomNumber(5, 1);
+var createAd = function () {
+  var locationX = getRandomNumber(900, 300);
+  var locationY = getRandomNumber(500, 100);
+  var roomsNumber = getRandomNumber(5, 1);
 
   return {
     author: {avatar: getAnyElementFisher(userAvatarPaths)},
@@ -156,6 +156,56 @@ var createNodeWithDetailInfo = function (singleAd) {
   return newElement;
 };
 
+/**
+ *
+ * @param {integer} elementsNumberInArray - количество элементов в создаваемом массиве
+ * @return {Array} - массив сгенерированных элементов
+ */
+var createArrayOfAds = function (elementsNumberInArray) {
+  var someArray = [];
+  for (i = 0; i < elementsNumberInArray; i++) {
+    someArray.push(createAd());
+  }
+  return someArray;
+};
+
+/**
+ * Генерирую html-фрагмент, в котором будут отрисовываться пин-флажки и аватарки
+ * @param {object} someArray - массив объявлений
+ * @param {object} pin - размеры пин-флажка
+ * @return {DocumentFragment} - html-фрагмент
+ */
+var generateFragmentOfAds = function (someArray, pin) {
+  var someFragment = document.createDocumentFragment();
+  var arrayLength = someArray.length;
+  for (i = 0; i < arrayLength; i++) {
+    someFragment.appendChild(createAnotherDiv(someArray[i], pin));
+  }
+  return someFragment;
+};
+
+/**
+ * Отрисовываю конкретное объявление в детальном виде
+ * @param {object} someArray - массив объявлений
+ * @param {integer} numberOfCurrentAd - номер объявления, которое надо отрисовать в детальном виде
+ */
+var showAdInDetailedView = function (someArray, numberOfCurrentAd) {
+  var oldDialogPanel = document.querySelector('.dialog__panel');
+  oldDialogPanel.parentNode.replaceChild(createNodeWithDetailInfo(someArray[numberOfCurrentAd]), oldDialogPanel);
+
+  // Меняю аватар в блоке с детальным описанием объявления
+  document.getElementById('offer-dialog').querySelector('.dialog__title').querySelector('img').setAttribute('src', someArray[numberOfCurrentAd].author.avatar);
+};
+
+/**
+ * Добавление фрагмента на карту
+ * @param {object} someFragment - фрагмент
+ */
+var showAllAdsOnMap = function (someFragment) {
+  var pinMap = document.querySelector('.tokyo__pin-map');
+  pinMap.appendChild(someFragment);
+};
+
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -193,31 +243,18 @@ var additionalFeatures = {
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 var i = 0;
-var arrayOfAds = [];
-var fragment = document.createDocumentFragment();
+
 var templateOffer = document.getElementById('lodge-template').content;
-var locationX = 0;
-var locationY = 0;
-var roomsNumber = 0;
+var adsNumber = 8;
 
-for (i = 0; i < 8; i++) {
-  // Генерация массива объявляений
-  arrayOfAds.push(addCreateAd());
+// Генерация массива объявляений
+var arrayOfAds = createArrayOfAds(adsNumber);
 
-  // Добавляю новый div-узел во фрагмент
-  fragment.appendChild(createAnotherDiv(arrayOfAds[i], pinSize));
+// Генерирую html-фрагмент на основе массива объявлений
+var fragment = generateFragmentOfAds(arrayOfAds, pinSize);
 
-  // Если данная итерация цикла первая, тогда вставить первое сгенерированное объявление в блок с id="offer-dialog" - детальное описание объявления
-  if (i === 0) {
-    var oldDialogPanel = document.querySelector('.dialog__panel');
-    oldDialogPanel.parentNode.replaceChild(createNodeWithDetailInfo(arrayOfAds[i]), oldDialogPanel);
+// Отрисовываю сгенерированные объявления на карте
+showAllAdsOnMap(fragment);
 
-    // Меняю аватар в блоке с детальным описанием объявления
-    document.getElementById('offer-dialog').querySelector('.dialog__title').querySelector('img').setAttribute('src', arrayOfAds[i].author.avatar);
-  }
-}
-
-var pinMap = document.querySelector('.tokyo__pin-map');
-pinMap.appendChild(fragment);
-
-
+// Отрисовываю конкретное объявление в детальном виде
+showAdInDetailedView(arrayOfAds, 0);
