@@ -135,6 +135,7 @@ var createAnotherPin = function (singleAd) {
  * @return {Element} - html узел с детальным описанием объявления
  */
 var createNodeWithDetailInfo = function (singleAd) {
+  var templateOffer = document.getElementById('lodge-template').content;
   var newElement = templateOffer.cloneNode(true);
 
   // Заполняю блок данными из объявления
@@ -163,7 +164,7 @@ var createNodeWithDetailInfo = function (singleAd) {
  */
 var createArrayOfAds = function (elementsNumberInArray) {
   var someArray = [];
-  for (i = 0; i < elementsNumberInArray; i++) {
+  for (var i = 0; i < elementsNumberInArray; i++) {
     someArray.push(createAd());
   }
   return someArray;
@@ -178,7 +179,7 @@ var createArrayOfAds = function (elementsNumberInArray) {
 var generateFragmentOfAds = function (someArray, pin) {
   var someFragment = document.createDocumentFragment();
   var arrayLength = someArray.length;
-  for (i = 0; i < arrayLength; i++) {
+  for (var i = 0; i < arrayLength; i++) {
     someFragment.appendChild(createAnotherDiv(someArray[i], pin));
   }
   return someFragment;
@@ -241,10 +242,6 @@ var additionalFeatures = {
 };
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-var i = 0;
-
-var templateOffer = document.getElementById('lodge-template').content;
 var adsNumber = 8;
 
 // Генерация массива объявляений
