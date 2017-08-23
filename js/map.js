@@ -109,9 +109,9 @@ var createAnotherDiv = function (singleAd, pin) {
 
   var newPin = document.createElement('img');
   newPin.classList.add('rounded');
-  newPin.style.src = singleAd.author.avatar;
-  newPin.style.width = 40;
-  newPin.style.height = 40;
+  newPin.src = singleAd.author.avatar;
+  newPin.width = 40;
+  newPin.height = 40;
 
   newDiv.appendChild(newPin);
   return newDiv;
@@ -129,7 +129,7 @@ var createNodeWithDetailInfo = function (singleAd) {
   // Заполняю блок данными из объявления
   newElement.querySelector('.lodge__title').textContent = singleAd.offer.title;
   newElement.querySelector('.lodge__address').textContent = singleAd.offer.address;
-  newElement.querySelector('.lodge__price').innerHTML = singleAd.offer.price + '&#x20bd;/ночь'; /* Здесь надо применить именно innerHTML, т.к. код символа рубля можно записать только так*/
+  newElement.querySelector('.lodge__price').innerHTML = singleAd.offer.price + '&#x20bd;/ночь'; /* Здесь надо применить именно innerHTML, т.к. код символа рубля можно отобразить только так*/
   newElement.querySelector('.lodge__type').textContent = getRusLodgeType(singleAd.offer.type);
   newElement.querySelector('.lodge__rooms-and-guests').textContent = 'Для ' + singleAd.offer.guests + ' гостей в ' + singleAd.offer.rooms + ' комнатах';
   newElement.querySelector('.lodge__checkin-time').textContent = 'Заезд после ' + singleAd.offer.checkin + ', выезд до ' + singleAd.offer.checkout;
@@ -137,9 +137,10 @@ var createNodeWithDetailInfo = function (singleAd) {
 
   // В цикле генерирую span-элементы обозначающие доп. опции жилища
   var featuresNumber = singleAd.offer.features.length;
-  for (var j = 0; j < featuresNumber; j++) {
+  for (var i = 0; i < featuresNumber; i++) {
     var newSpan = document.createElement('span');
-    newSpan.className = 'feature__image feature__image--' + singleAd.offer.features[j];
+    newSpan.classList.add('feature__image');
+    newSpan.classList.add('feature__image--' + singleAd.offer.features[i]);
     newElement.querySelector('.lodge__features').appendChild(newSpan);
   }
   return newElement;
@@ -164,13 +165,15 @@ var createArrayOfAds = function (elementsNumberInArray) {
  * @param {object} pin - размеры пин-флажка
  * @return {DocumentFragment} - html-фрагмент
  */
-var generateFragmentOfAds = function (someArray, pin) {
+var generateAndShowFragmentOfAds = function (someArray, pin) {
   var someFragment = document.createDocumentFragment();
   var arrayLength = someArray.length;
   for (var i = 0; i < arrayLength; i++) {
     someFragment.appendChild(createAnotherDiv(someArray[i], pin));
   }
-  return someFragment;
+  // Отрисовываю сгенерированные объявления на карте
+  pinMap.appendChild(someFragment);
+
 };
 
 /**
@@ -180,18 +183,10 @@ var generateFragmentOfAds = function (someArray, pin) {
  */
 var showAdInDetailedView = function (someArray, numberOfCurrentAd) {
   var oldDialogPanel = document.querySelector('.dialog__panel');
-  oldDialogPanel.parentNode.replaceChild(createNodeWithDetailInfo(someArray[numberOfCurrentAd]), oldDialogPanel);
+  oldDialogPanel.parentElement.replaceChild(createNodeWithDetailInfo(someArray[numberOfCurrentAd]), oldDialogPanel);
 
   // Меняю аватар в блоке с детальным описанием объявления
   document.getElementById('offer-dialog').querySelector('.dialog__title').querySelector('img').setAttribute('src', someArray[numberOfCurrentAd].author.avatar);
-};
-
-/**
- * Добавление фрагмента на карту
- * @param {object} someFragment - фрагмент
- */
-var showAllAdsOnMap = function (someFragment) {
-  pinMap.appendChild(someFragment);
 };
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -226,11 +221,8 @@ var pinMap = document.querySelector('.tokyo__pin-map');
 // Генерация массива объявляений
 var arrayOfAds = createArrayOfAds(adsNumber);
 
-// Генерирую html-фрагмент на основе массива объявлений
-var fragment = generateFragmentOfAds(arrayOfAds, pinSize);
-
-// Отрисовываю сгенерированные объявления на карте
-showAllAdsOnMap(fragment);
+// Генерирую и отрисовываю html-фрагмент на основе массива объявлений
+generateAndShowFragmentOfAds(arrayOfAds, pinSize);
 
 // Отрисовываю конкретное объявление в детальном виде
 showAdInDetailedView(arrayOfAds, 0);
