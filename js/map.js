@@ -99,13 +99,19 @@ var createAd = function (adNumber) {
  * Создание div-блока для нового флажка
  * @param {Object} singleAd - экземпляр объявления
  * @param  {Object} pin - размеры пин-флажка
+ * @param  {boolean} isPinActive - создать данный блок актитвным или нет
  * @return {Element} - div-блок, html узел
  */
-var createAnotherDiv = function (singleAd, pin) {
+var createAnotherDiv = function (singleAd, pin, isPinActive) {
   var newDiv = document.createElement('div');
   newDiv.classList.add('pin');
+  if (isPinActive) {
+    newDiv.classList.add('pin--active');
+  }
   newDiv.style.left = (singleAd.location.x + pin.width / 2) + 'px';
   newDiv.style.top = (singleAd.location.y + pin.height) + 'px';
+  newDiv.dataset.id = singleAd.author.avatar + '_' + singleAd.location.x.toString() + '_' + singleAd.location.y.toString();
+  newDiv.tabIndex = 0;
 
   var newPin = document.createElement('img');
   newPin.classList.add('rounded');
@@ -168,7 +174,7 @@ var generateAndShowFragmentOfAds = function (someArray, pin) {
   var someFragment = document.createDocumentFragment();
   var arrayLength = someArray.length;
   for (var i = 0; i < arrayLength; i++) {
-    someFragment.appendChild(createAnotherDiv(someArray[i], pin));
+    someFragment.appendChild(createAnotherDiv(someArray[i], pin, i === 0 ? true : false));
   }
   // Отрисовываю сгенерированные объявления на карте
   pinMap.appendChild(someFragment);
@@ -229,22 +235,38 @@ showAdInDetailedView(arrayOfAds, 0);
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // События
 var clickedPin = null;
+var offerDialog = document.getElementById('offer-dialog');
 var pinClickHandler = function (evt) {
-  if (evt.target.tagName === 'IMG') {
-    clickedPin = evt.target.parentElement;
-  } else {
-    clickedPin = evt.target;
-  }
-
-  if (!clickedPin.classList.contains('pin__main')) {
-    var childrenNumber = clickedPin.parentElement.children.length;
-    for (var i = 0; i < childrenNumber; i++) {
-      clickedPin.parentElement.children[i].classList.remove('pin--active');
+  if (evt.type.toString().toLowerCase() === 'click' || evt.keyCode === 13) {
+    if (evt.target.tagName === 'IMG') {
+      clickedPin = evt.target.parentElement;
+    } else {
+      clickedPin = evt.target;
     }
-    clickedPin.classList.add('pin--active');
+
+    if (!clickedPin.classList.contains('pin__main')) {
+      var childrenNumber = clickedPin.parentElement.children.length;
+      for (var i = 0; i < childrenNumber; i++) {
+        clickedPin.parentElement.children[i].classList.remove('pin--active');
+      }
+      clickedPin.classList.add('pin--active');
+      showAdInDetailedView(arrayOfAds, Array.prototype.indexOf.call(pinMap.querySelectorAll('div[data-id^="img/avatars/user"]'), clickedPin));
+      offerDialog.classList.remove('hidden');
+    }
   }
 };
 
-pinMap.addEventListener('click', pinClickHandler);
+var buttonCloseOffer = document.querySelector('.dialog__close');
+var closeOfferClickHandler = function (evt) {
+  if (evt.type.toString().toLowerCase() === 'click' || evt.keyCode === 27) {
+    offerDialog.classList.add('hidden');
+    pinMap.querySelector('.pin--active').classList.remove('pin--active');
+  }
+};
 
+
+pinMap.addEventListener('click', pinClickHandler);
+pinMap.addEventListener('keydown', pinClickHandler);
+buttonCloseOffer.addEventListener('click', closeOfferClickHandler);
+window.addEventListener('keydown', closeOfferClickHandler);
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
