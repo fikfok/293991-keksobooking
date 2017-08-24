@@ -224,3 +224,27 @@ generateAndShowFragmentOfAds(arrayOfAds, pinSize);
 
 // Отрисовываю конкретное объявление в детальном виде
 showAdInDetailedView(arrayOfAds, 0);
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// События
+var clickedPin = null;
+var pinClickHandler = function (evt) {
+  if (evt.target.tagName === 'IMG') {
+    clickedPin = evt.target.parentElement;
+  } else {
+    clickedPin = evt.target;
+  }
+
+  if (!clickedPin.classList.contains('pin__main')) {
+    var childrenNumber = clickedPin.parentElement.children.length;
+    for (var i = 0; i < childrenNumber; i++) {
+      clickedPin.parentElement.children[i].classList.remove('pin--active');
+    }
+    clickedPin.classList.add('pin--active');
+  }
+};
+
+pinMap.addEventListener('click', pinClickHandler);
+
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
