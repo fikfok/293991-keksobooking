@@ -110,7 +110,7 @@ var createAnotherDiv = function (singleAd, pin, isPinActive) {
   }
   newDiv.style.left = (singleAd.location.x + pin.width / 2) + 'px';
   newDiv.style.top = (singleAd.location.y + pin.height) + 'px';
-  newDiv.dataset.id = singleAd.author.avatar + '_' + singleAd.location.x.toString() + '_' + singleAd.location.y.toString();
+  newDiv.dataset.id = singleAd.author.avatar + '_' + singleAd.location.x + '_' + singleAd.location.y;
   newDiv.tabIndex = 0;
 
   var newPin = document.createElement('img');
@@ -227,6 +227,8 @@ var arrayOfAds = createArrayOfAds(adsNumber);
 
 // Генерирую и отрисовываю html-фрагмент на основе массива объявлений
 generateAndShowFragmentOfAds(arrayOfAds, pinSize);
+var collectionOfDivsWithPins = pinMap.querySelectorAll('div[data-id^="img/avatars/user"]');
+
 
 // Отрисовываю конкретное объявление в детальном виде
 showAdInDetailedView(arrayOfAds, 0);
@@ -238,19 +240,17 @@ var clickedPin = null;
 var offerDialog = document.getElementById('offer-dialog');
 var pinClickHandler = function (evt) {
   if (evt.type.toString().toLowerCase() === 'click' || evt.keyCode === 13) {
-    if (evt.target.tagName === 'IMG') {
-      clickedPin = evt.target.parentElement;
-    } else {
-      clickedPin = evt.target;
-    }
+    clickedPin = (evt.target.tagName.toLowerCase() === 'img') ? evt.target.parentElement : evt.target;
 
     if (!clickedPin.classList.contains('pin__main')) {
       var childrenNumber = clickedPin.parentElement.children.length;
       for (var i = 0; i < childrenNumber; i++) {
-        clickedPin.parentElement.children[i].classList.remove('pin--active');
+        if (clickedPin.parentElement.children[i].classList.contains('pin--active')) {
+          clickedPin.parentElement.children[i].classList.remove('pin--active');
+        }
       }
       clickedPin.classList.add('pin--active');
-      showAdInDetailedView(arrayOfAds, Array.prototype.indexOf.call(pinMap.querySelectorAll('div[data-id^="img/avatars/user"]'), clickedPin));
+      showAdInDetailedView(arrayOfAds, Array.prototype.indexOf.call(collectionOfDivsWithPins, clickedPin));
       offerDialog.classList.remove('hidden');
     }
   }
