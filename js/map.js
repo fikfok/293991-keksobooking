@@ -238,6 +238,11 @@ showAdInDetailedView(arrayOfAds, 0);
 // События
 var clickedPin = null;
 var offerDialog = document.getElementById('offer-dialog');
+
+/**
+ * Обработчик события нажатия на пин-флажок. Отслеживается клик мыши и нажатие Enter
+ * @param {object} evt - данные о событии
+ */
 var pinClickHandler = function (evt) {
   if (evt.type.toString().toLowerCase() === 'click' || evt.keyCode === 13) {
     clickedPin = (evt.target.tagName.toLowerCase() === 'img') ? evt.target.parentElement : evt.target;
@@ -257,6 +262,10 @@ var pinClickHandler = function (evt) {
 };
 
 var buttonCloseOffer = document.querySelector('.dialog__close');
+/**
+ * Обработчик события нажатия на крестик закрытия окна оффера. Отслеживается клик мыши и нажатие Esc
+ * @param {object} evt - данные о событии
+ */
 var closeOfferClickHandler = function (evt) {
   if (evt.type.toString().toLowerCase() === 'click' || evt.keyCode === 27) {
     offerDialog.classList.add('hidden');
@@ -269,4 +278,143 @@ pinMap.addEventListener('click', pinClickHandler);
 pinMap.addEventListener('keydown', pinClickHandler);
 buttonCloseOffer.addEventListener('click', closeOfferClickHandler);
 window.addEventListener('keydown', closeOfferClickHandler);
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// Валидация формы
+/**
+ * Обработчик невалидной данной формы notice__form
+ * @param {object} evt - данные о событии
+ */
+var formValidationHandler = function (evt) {
+  // Сбрасываю красную рамку у полей, которые в данной итерации корректны, а в предыдущей итерации не были корректны
+  var validElementsWithRedBorder = newOfferForm.querySelectorAll('input:valid[style*="border-color: rgb(255, 0, 0)"]');
+  if (validElementsWithRedBorder.length > 0) {
+    var elementsNumber = validElementsWithRedBorder.length;
+    for (var i = 0; i < elementsNumber; i++) {
+      validElementsWithRedBorder[i].style.borderColor = null;
+    }
+  }
+  if (checkRoomNumber() === 'ок') {
+    selectRoomNumber.style.borderColor = null;
+  }
+
+  // Рисую некорректным полям красную рамку
+  var element = evt.target;
+  element.style.borderColor = 'rgb(255, 0, 0)';
+};
+
+/**
+ * Обработчик выпадающих списков
+ * @param {object} evt - данные о событии
+ */
+var selectChangeHandler = function (evt) {
+  if (evt.target.id.toString().toLowerCase() === 'timein') {
+    selectTimeOut.value = evt.target.value;
+  } else if (evt.target.id.toString().toLowerCase() === 'timeout') {
+    selectTimeIn.value = evt.target.value;
+  } else if (evt.target.id.toString().toLowerCase() === 'type') {
+    if (evt.target.value.toString().toLowerCase() === 'bungalo') {
+      inputPriceForNight.min = 0;
+    } else if (evt.target.value.toString().toLowerCase() === 'flat') {
+      inputPriceForNight.min = 1000;
+    } else if (evt.target.value.toString().toLowerCase() === 'house') {
+      inputPriceForNight.min = 5000;
+    } else if (evt.target.value.toString().toLowerCase() === 'palace') {
+      inputPriceForNight.min = 10000;
+    }
+  }
+};
+
+/**
+ * Проверка правильности установки количества комнат и гостей
+ * @return {string} - результат проверки
+ */
+var checkRoomNumber = function () {
+  var result = '';
+  if (selectRoomNumber.value === '1') {
+    if (!(selectCapacity.value === '0')) {
+      result = '1 комната только для варианта "не для гостей"';
+    } else {
+      result = 'ок';
+    }
+  } else if (selectRoomNumber.value === '2' || selectRoomNumber.value === '100') {
+    if (!(selectCapacity.value === '3')) {
+      result = '2 или 100 комнат только для 3 гостей';
+    } else {
+      result = 'ок';
+    }
+  } else if (selectRoomNumber.value === '3') {
+    result = 'ок';
+  }
+  return result;
+};
+
+/**
+ * Обработчик отправки формы
+ */
+var submitClickHandler = function () {
+  // По заданию сказано проверять именно при отправке
+  var checkResult = (checkRoomNumber() === 'ок') ? '' : checkRoomNumber();
+  selectRoomNumber.setCustomValidity(checkResult);
+
+  if (newOfferForm.checkValidity()) {
+    newOfferForm.submit();
+  }
+};
+
+/**
+ * Сброс формы в первоначальное состояние
+ * @param {object} defaultData - дефолтные данные контролов в форме оффера
+ */
+/*
+Сброс формы в дефолтное состояние. Будет использовано позже
+var fillFormByDefaultValues = function (defaultData) {
+  inputTitle.value = defaultData.title;
+  selectApartType.value = defaultData.type;
+  inputPriceForNight.value = defaultData.price;
+  selectRoomNumber.value = defaultData.roomNumber;
+  selectCapacity.value = defaultData.capacity;
+  textareaDescription.value = defaultData.description;
+  inputAddress.value = defaultData.address;
+  selectTimeIn.value = defaultData.timeIn;
+  selectTimeOut.value = defaultData.timeOut;
+};
+
+var defaultValuesForOffer = {
+  title: '',
+  type: 'flat',
+  price: 1000,
+  roomNumber: 1,
+  capacity: 3,
+  description: '',
+  address: '',
+  timeIn: '12:00',
+  timeOut: '12:00'
+};
+var inputTitle = newOfferForm.querySelector('input#title');
+var textareaDescription = newOfferForm.querySelector('textarea#description');
+var inputAddress = newOfferForm.querySelector('input#address');
+*/
+
+var newOfferForm = document.querySelector('form.notice__form');
+var selectApartType = newOfferForm.querySelector('select#type');
+var inputPriceForNight = newOfferForm.querySelector('input#price');
+var selectRoomNumber = newOfferForm.querySelector('select#room_number');
+var selectCapacity = newOfferForm.querySelector('select#capacity');
+var selectTimeIn = newOfferForm.querySelector('select#timein');
+var selectTimeOut = newOfferForm.querySelector('select#timeout');
+var buttonSubmit = newOfferForm.querySelector('button.form__submit');
+
+newOfferForm.addEventListener('invalid', formValidationHandler, true);
+selectTimeIn.addEventListener('change', selectChangeHandler);
+selectTimeOut.addEventListener('change', selectChangeHandler);
+selectApartType.addEventListener('change', selectChangeHandler);
+// Решил всё-таки привязать функцию именно к нажатию кнопки, т.к. если привязать на событие submit формы и вызвать preventDefault,
+// то почему-то некорректно отрабатывает проверка сочетания количества комнат и жильцов: если тестировать на некорректность,
+// то независимо от значений высвечивает одно и тоже ссобщение об ошибке '1 комната только для варианта "не для гостей"'
+buttonSubmit.addEventListener('click', submitClickHandler);
+
+
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
