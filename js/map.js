@@ -334,19 +334,29 @@ var selectChangeHandler = function (evt) {
 var checkRoomNumber = function () {
   var result = '';
   if (selectRoomNumber.value === '1') {
-    if (!(selectCapacity.value === '0')) {
-      result = '1 комната только для варианта "не для гостей"';
+    if (!(selectCapacity.value === '1')) {
+      result = '1 комната только для одного гостя';
     } else {
       result = 'ок';
     }
-  } else if (selectRoomNumber.value === '2' || selectRoomNumber.value === '100') {
-    if (!(selectCapacity.value === '3')) {
-      result = '2 или 100 комнат только для 3 гостей';
+  } else if (selectRoomNumber.value === '2') {
+    if (!(selectCapacity.value === '1' || selectCapacity.value === '2')) {
+      result = '2 комнат только для 2-х или 1-го гостя';
     } else {
       result = 'ок';
     }
   } else if (selectRoomNumber.value === '3') {
-    result = 'ок';
+    if (!(selectCapacity.value === '1' || selectCapacity.value === '2' || selectCapacity.value === '3')) {
+      result = '3 комнат только для 3-х, 2-х или 1-го гостя';
+    } else {
+      result = 'ок';
+    }
+  } else if (selectRoomNumber.value === '100') {
+    if (!(selectCapacity.value === '0')) {
+      result = '100 комнат не для гостей';
+    } else {
+      result = 'ок';
+    }
   }
   return result;
 };
@@ -363,40 +373,6 @@ var submitClickHandler = function () {
     newOfferForm.submit();
   }
 };
-
-/**
- * Сброс формы в первоначальное состояние
- * @param {object} defaultData - дефолтные данные контролов в форме оффера
- */
-/*
-Сброс формы в дефолтное состояние. Будет использовано позже
-var fillFormByDefaultValues = function (defaultData) {
-  inputTitle.value = defaultData.title;
-  selectApartType.value = defaultData.type;
-  inputPriceForNight.value = defaultData.price;
-  selectRoomNumber.value = defaultData.roomNumber;
-  selectCapacity.value = defaultData.capacity;
-  textareaDescription.value = defaultData.description;
-  inputAddress.value = defaultData.address;
-  selectTimeIn.value = defaultData.timeIn;
-  selectTimeOut.value = defaultData.timeOut;
-};
-
-var defaultValuesForOffer = {
-  title: '',
-  type: 'flat',
-  price: 1000,
-  roomNumber: 1,
-  capacity: 3,
-  description: '',
-  address: '',
-  timeIn: '12:00',
-  timeOut: '12:00'
-};
-var inputTitle = newOfferForm.querySelector('input#title');
-var textareaDescription = newOfferForm.querySelector('textarea#description');
-var inputAddress = newOfferForm.querySelector('input#address');
-*/
 
 var newOfferForm = document.querySelector('form.notice__form');
 var selectApartType = newOfferForm.querySelector('select#type');
