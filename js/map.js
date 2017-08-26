@@ -1,5 +1,12 @@
 'use strict';
 
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+var BUNGALO_MIN_PRICE_PRE_NIGHT = 0;
+var FLAT_MIN_PRICE_PRE_NIGHT = 1000;
+var HOUSE_MIN_PRICE_PRE_NIGHT = 5000;
+var PALACE_MIN_PRICE_PRE_NIGHT = 10000;
+
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // Функции
 /**
@@ -244,20 +251,19 @@ var offerDialog = document.getElementById('offer-dialog');
  * @param {object} evt - данные о событии
  */
 var pinClickHandler = function (evt) {
-  if (evt.type.toString().toLowerCase() === 'click' || evt.keyCode === 13) {
-    clickedPin = (evt.target.tagName.toLowerCase() === 'img') ? evt.target.parentElement : evt.target;
+  clickedPin = (evt.target.tagName.toLowerCase() === 'img') ? evt.target.parentElement : evt.target;
 
-    if (!clickedPin.classList.contains('pin__main')) {
-      var childrenNumber = clickedPin.parentElement.children.length;
-      for (var i = 0; i < childrenNumber; i++) {
-        if (clickedPin.parentElement.children[i].classList.contains('pin--active')) {
-          clickedPin.parentElement.children[i].classList.remove('pin--active');
-        }
+  if (!clickedPin.classList.contains('pin__main')) {
+    var childrenNumber = clickedPin.parentElement.children.length;
+    for (var i = 0; i < childrenNumber; i++) {
+      if (clickedPin.parentElement.children[i].classList.contains('pin--active')) {
+        clickedPin.parentElement.children[i].classList.remove('pin--active');
       }
-      clickedPin.classList.add('pin--active');
-      showAdInDetailedView(arrayOfAds, Array.prototype.indexOf.call(collectionOfDivsWithPins, clickedPin));
-      offerDialog.classList.remove('hidden');
     }
+    clickedPin.classList.add('pin--active');
+    showAdInDetailedView(arrayOfAds, Array.prototype.indexOf.call(collectionOfDivsWithPins, clickedPin));
+    offerDialog.classList.remove('hidden');
+    window.addEventListener('keydown', closeOfferClickHandlerEscPress);
   }
 };
 
@@ -266,20 +272,26 @@ var buttonCloseOffer = document.querySelector('.dialog__close');
  * Обработчик события нажатия на крестик закрытия окна оффера. Отслеживается клик мыши и нажатие Esc
  * @param {object} evt - данные о событии
  */
-var closeOfferClickHandler = function (evt) {
-  if (evt.type.toString().toLowerCase() === 'click' || evt.keyCode === 27) {
-    offerDialog.classList.add('hidden');
-    pinMap.querySelector('.pin--active').classList.remove('pin--active');
+var closeOfferClickHandler = function () {
+  offerDialog.classList.add('hidden');
+  pinMap.querySelector('.pin--active').classList.remove('pin--active');
+  window.removeEventListener('keydown', closeOfferClickHandlerEscPress);
+};
+
+var closeOfferClickHandlerEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeOfferClickHandler();
   }
 };
 
-
 pinMap.addEventListener('click', pinClickHandler);
-pinMap.addEventListener('keydown', pinClickHandler);
+pinMap.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    pinClickHandler(evt);
+  }
+});
 buttonCloseOffer.addEventListener('click', closeOfferClickHandler);
-window.addEventListener('keydown', closeOfferClickHandler);
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // Валидация формы
@@ -316,13 +328,13 @@ var selectChangeHandler = function (evt) {
     selectTimeIn.value = evt.target.value;
   } else if (evt.target.id.toString().toLowerCase() === 'type') {
     if (evt.target.value.toString().toLowerCase() === 'bungalo') {
-      inputPriceForNight.min = 0;
+      inputPriceForNight.min = BUNGALO_MIN_PRICE_PRE_NIGHT;
     } else if (evt.target.value.toString().toLowerCase() === 'flat') {
-      inputPriceForNight.min = 1000;
+      inputPriceForNight.min = FLAT_MIN_PRICE_PRE_NIGHT;
     } else if (evt.target.value.toString().toLowerCase() === 'house') {
-      inputPriceForNight.min = 5000;
+      inputPriceForNight.min = HOUSE_MIN_PRICE_PRE_NIGHT;
     } else if (evt.target.value.toString().toLowerCase() === 'palace') {
-      inputPriceForNight.min = 10000;
+      inputPriceForNight.min = PALACE_MIN_PRICE_PRE_NIGHT;
     }
   }
 };
@@ -391,6 +403,4 @@ selectApartType.addEventListener('change', selectChangeHandler);
 // то почему-то некорректно отрабатывает проверка сочетания количества комнат и жильцов: если тестировать на некорректность,
 // то независимо от значений высвечивает одно и тоже ссобщение об ошибке '1 комната только для варианта "не для гостей"'
 buttonSubmit.addEventListener('click', submitClickHandler);
-
-
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
