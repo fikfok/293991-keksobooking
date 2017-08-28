@@ -9,7 +9,7 @@ window.data = (function () {
   var HOUSE_MIN_PRICE_PRE_NIGHT = 5000;
   var PALACE_MIN_PRICE_PRE_NIGHT = 10000;
   var RED_COLOR = 'rgb(255, 0, 0)';
-  
+
   /**
    * Генерация массива путей к аватарам
    * @param {integer} numberOfElements - количество элементов в массиве
