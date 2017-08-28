@@ -1,5 +1,12 @@
 'use strict';
 
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+var BUNGALO_MIN_PRICE_PRE_NIGHT = 0;
+var FLAT_MIN_PRICE_PRE_NIGHT = 1000;
+var HOUSE_MIN_PRICE_PRE_NIGHT = 5000;
+var PALACE_MIN_PRICE_PRE_NIGHT = 10000;
+
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // Функции
 /**
@@ -238,35 +245,162 @@ showAdInDetailedView(arrayOfAds, 0);
 // События
 var clickedPin = null;
 var offerDialog = document.getElementById('offer-dialog');
-var pinClickHandler = function (evt) {
-  if (evt.type.toString().toLowerCase() === 'click' || evt.keyCode === 13) {
-    clickedPin = (evt.target.tagName.toLowerCase() === 'img') ? evt.target.parentElement : evt.target;
 
-    if (!clickedPin.classList.contains('pin__main')) {
-      var childrenNumber = clickedPin.parentElement.children.length;
-      for (var i = 0; i < childrenNumber; i++) {
-        if (clickedPin.parentElement.children[i].classList.contains('pin--active')) {
-          clickedPin.parentElement.children[i].classList.remove('pin--active');
-        }
+/**
+ * Обработчик события нажатия на пин-флажок. Отслеживается клик мыши и нажатие Enter
+ * @param {object} evt - данные о событии
+ */
+var pinClickHandler = function (evt) {
+  clickedPin = (evt.target.tagName.toLowerCase() === 'img') ? evt.target.parentElement : evt.target;
+
+  if (!clickedPin.classList.contains('pin__main')) {
+    var childrenNumber = clickedPin.parentElement.children.length;
+    for (var i = 0; i < childrenNumber; i++) {
+      if (clickedPin.parentElement.children[i].classList.contains('pin--active')) {
+        clickedPin.parentElement.children[i].classList.remove('pin--active');
       }
-      clickedPin.classList.add('pin--active');
-      showAdInDetailedView(arrayOfAds, Array.prototype.indexOf.call(collectionOfDivsWithPins, clickedPin));
-      offerDialog.classList.remove('hidden');
     }
+    clickedPin.classList.add('pin--active');
+    showAdInDetailedView(arrayOfAds, Array.prototype.indexOf.call(collectionOfDivsWithPins, clickedPin));
+    offerDialog.classList.remove('hidden');
+    window.addEventListener('keydown', closeOfferClickHandlerEscPress);
   }
 };
 
 var buttonCloseOffer = document.querySelector('.dialog__close');
-var closeOfferClickHandler = function (evt) {
-  if (evt.type.toString().toLowerCase() === 'click' || evt.keyCode === 27) {
-    offerDialog.classList.add('hidden');
-    pinMap.querySelector('.pin--active').classList.remove('pin--active');
+/**
+ * Обработчик события нажатия на крестик закрытия окна оффера. Отслеживается клик мыши и нажатие Esc
+ * @param {object} evt - данные о событии
+ */
+var closeOfferClickHandler = function () {
+  offerDialog.classList.add('hidden');
+  pinMap.querySelector('.pin--active').classList.remove('pin--active');
+  window.removeEventListener('keydown', closeOfferClickHandlerEscPress);
+};
+
+var closeOfferClickHandlerEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeOfferClickHandler();
   }
 };
 
-
 pinMap.addEventListener('click', pinClickHandler);
-pinMap.addEventListener('keydown', pinClickHandler);
+pinMap.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    pinClickHandler(evt);
+  }
+});
 buttonCloseOffer.addEventListener('click', closeOfferClickHandler);
-window.addEventListener('keydown', closeOfferClickHandler);
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// Валидация формы
+/**
+ * Обработчик невалидной данной формы notice__form
+ * @param {object} evt - данные о событии
+ */
+var formValidationHandler = function (evt) {
+  // Сбрасываю красную рамку у полей, которые в данной итерации корректны, а в предыдущей итерации не были корректны
+  var validElementsWithRedBorder = newOfferForm.querySelectorAll('input:valid[style*="border-color: rgb(255, 0, 0)"]');
+  if (validElementsWithRedBorder.length > 0) {
+    var elementsNumber = validElementsWithRedBorder.length;
+    for (var i = 0; i < elementsNumber; i++) {
+      validElementsWithRedBorder[i].style.borderColor = null;
+    }
+  }
+  if (checkRoomNumber() === 'ок') {
+    selectRoomNumber.style.borderColor = null;
+  }
+
+  // Рисую некорректным полям красную рамку
+  var element = evt.target;
+  element.style.borderColor = 'rgb(255, 0, 0)';
+};
+
+/**
+ * Обработчик выпадающих списков
+ * @param {object} evt - данные о событии
+ */
+var selectChangeHandler = function (evt) {
+  if (evt.target.id.toString().toLowerCase() === 'timein') {
+    selectTimeOut.value = evt.target.value;
+  } else if (evt.target.id.toString().toLowerCase() === 'timeout') {
+    selectTimeIn.value = evt.target.value;
+  } else if (evt.target.id.toString().toLowerCase() === 'type') {
+    if (evt.target.value.toString().toLowerCase() === 'bungalo') {
+      inputPriceForNight.min = BUNGALO_MIN_PRICE_PRE_NIGHT;
+    } else if (evt.target.value.toString().toLowerCase() === 'flat') {
+      inputPriceForNight.min = FLAT_MIN_PRICE_PRE_NIGHT;
+    } else if (evt.target.value.toString().toLowerCase() === 'house') {
+      inputPriceForNight.min = HOUSE_MIN_PRICE_PRE_NIGHT;
+    } else if (evt.target.value.toString().toLowerCase() === 'palace') {
+      inputPriceForNight.min = PALACE_MIN_PRICE_PRE_NIGHT;
+    }
+  }
+};
+
+/**
+ * Проверка правильности установки количества комнат и гостей
+ * @return {string} - результат проверки
+ */
+var checkRoomNumber = function () {
+  var result = '';
+  if (selectRoomNumber.value === '1') {
+    if (!(selectCapacity.value === '1')) {
+      result = '1 комната только для одного гостя';
+    } else {
+      result = 'ок';
+    }
+  } else if (selectRoomNumber.value === '2') {
+    if (!(selectCapacity.value === '1' || selectCapacity.value === '2')) {
+      result = '2 комнат только для 2-х или 1-го гостя';
+    } else {
+      result = 'ок';
+    }
+  } else if (selectRoomNumber.value === '3') {
+    if (!(selectCapacity.value === '1' || selectCapacity.value === '2' || selectCapacity.value === '3')) {
+      result = '3 комнат только для 3-х, 2-х или 1-го гостя';
+    } else {
+      result = 'ок';
+    }
+  } else if (selectRoomNumber.value === '100') {
+    if (!(selectCapacity.value === '0')) {
+      result = '100 комнат не для гостей';
+    } else {
+      result = 'ок';
+    }
+  }
+  return result;
+};
+
+/**
+ * Обработчик отправки формы
+ */
+var submitClickHandler = function () {
+  // По заданию сказано проверять именно при отправке
+  var checkResult = (checkRoomNumber() === 'ок') ? '' : checkRoomNumber();
+  selectRoomNumber.setCustomValidity(checkResult);
+
+  if (newOfferForm.checkValidity()) {
+    newOfferForm.submit();
+  }
+};
+
+var newOfferForm = document.querySelector('form.notice__form');
+var selectApartType = newOfferForm.querySelector('select#type');
+var inputPriceForNight = newOfferForm.querySelector('input#price');
+var selectRoomNumber = newOfferForm.querySelector('select#room_number');
+var selectCapacity = newOfferForm.querySelector('select#capacity');
+var selectTimeIn = newOfferForm.querySelector('select#timein');
+var selectTimeOut = newOfferForm.querySelector('select#timeout');
+var buttonSubmit = newOfferForm.querySelector('button.form__submit');
+
+newOfferForm.addEventListener('invalid', formValidationHandler, true);
+selectTimeIn.addEventListener('change', selectChangeHandler);
+selectTimeOut.addEventListener('change', selectChangeHandler);
+selectApartType.addEventListener('change', selectChangeHandler);
+// Решил всё-таки привязать функцию именно к нажатию кнопки, т.к. если привязать на событие submit формы и вызвать preventDefault,
+// то почему-то некорректно отрабатывает проверка сочетания количества комнат и жильцов: если тестировать на некорректность,
+// то независимо от значений высвечивает одно и тоже ссобщение об ошибке '1 комната только для варианта "не для гостей"'
+buttonSubmit.addEventListener('click', submitClickHandler);
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
