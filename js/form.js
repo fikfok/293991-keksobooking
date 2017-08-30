@@ -2,108 +2,180 @@
 
 // Модуль для работы с формой создания объявления
 window.form = (function () {
+  var RED_COLOR = 'rgb(255, 0, 0)';
+  var BUNGALO_MIN_PRICE_PRE_NIGHT = 0;
+  var FLAT_MIN_PRICE_PRE_NIGHT = 1000;
+  var HOUSE_MIN_PRICE_PRE_NIGHT = 5000;
+  var PALACE_MIN_PRICE_PRE_NIGHT = 10000;
+
   /**
-   * Обработчик невалидной данной формы notice__form
-   * @param {object} evt - данные о событии
+   * Обработчик события ввода на элементе
+   * @param {object} event - данные о событии
    */
-  var formValidationHandler = function (evt) {
-    // Сбрасываю красную рамку у полей, которые в данной итерации корректны, а в предыдущей итерации не были корректны
-    var validElementsWithRedBorder = newOfferForm.querySelectorAll('input:valid[style*="border-color: ' + window.data.RED_COLOR + '"]');
-    if (validElementsWithRedBorder.length > 0) {
-      var elementsNumber = validElementsWithRedBorder.length;
-      for (var i = 0; i < elementsNumber; i++) {
-        validElementsWithRedBorder[i].style.borderColor = null;
+  function inputEnteringHandler(event) {
+    if (!formIsOk) {
+      formIsOk = true;
+      if (event.target.style.borderColor) {
+        event.target.style.borderColor = '';
       }
     }
-    if (checkRoomNumber() === 'ок') {
-      selectRoomNumber.style.borderColor = null;
-    }
+  }
 
-    // Некорректным полям рисую красную рамку
-    var element = evt.target;
-    element.style.borderColor = window.data.RED_COLOR;
+  /**
+   * Обработчик события потери фокуса на элементе
+   * @param {object} event - данные о событии
+   */
+  function inputBlurHandler(event) {
+    event.target.removeEventListener('input', inputEnteringHandler);
+    event.target.removeEventListener('blur', inputBlurHandler);
+  }
+
+  /**
+   * Пометка элементов формы, которые оказались не корректны
+   * @param {object} element - элемент, который надо пометить, что он некорректен
+   */
+  var showIncorrectElement = function (element) {
+    element.style.borderColor = RED_COLOR;
+    element.addEventListener('input', inputEnteringHandler);
+    element.addEventListener('blur', inputBlurHandler);
   };
 
   /**
-   * Обработчик выпадающих списков
-   * @param {object} evt - данные о событии
+   * Обработчик формы
+   * @param {object} event - данные о событии
    */
-  var selectChangeHandler = function (evt) {
-    if (evt.target.id.toString().toLowerCase() === 'timein') {
-      selectTimeOut.value = evt.target.value;
-    } else if (evt.target.id.toString().toLowerCase() === 'timeout') {
-      selectTimeIn.value = evt.target.value;
-    } else if (evt.target.id.toString().toLowerCase() === 'type') {
-      if (evt.target.value.toString().toLowerCase() === 'bungalo') {
-        inputPriceForNight.min = window.data.BUNGALO_MIN_PRICE_PRE_NIGHT;
-      } else if (evt.target.value.toString().toLowerCase() === 'flat') {
-        inputPriceForNight.min = window.data.FLAT_MIN_PRICE_PRE_NIGHT;
-      } else if (evt.target.value.toString().toLowerCase() === 'house') {
-        inputPriceForNight.min = window.data.HOUSE_MIN_PRICE_PRE_NIGHT;
-      } else if (evt.target.value.toString().toLowerCase() === 'palace') {
-        inputPriceForNight.min = window.data.PALACE_MIN_PRICE_PRE_NIGHT;
+  var submitFormHandler = function (event) {
+    event.preventDefault();
+    var fieldsNumber = fieldsForCheckInForm.length;
+    for (var i = 0; i < fieldsNumber; i++) {
+      fieldsForCheckInForm[i].style.borderColor = null;
+
+      if (fieldsForCheckInForm[i].type.toLowerCase() === 'text') {
+        if (fieldsForCheckInForm[i].name.toLowerCase() === 'title') {
+          if (fieldsForCheckInForm[i].value.length < 30 || fieldsForCheckInForm[i].value.length > 100) {
+            formIsOk = false;
+            showIncorrectElement(fieldsForCheckInForm[i]);
+          }
+        } else if (fieldsForCheckInForm[i].name.toLowerCase() === 'address') {
+          if (fieldsForCheckInForm[i].value.length === 0) {
+            formIsOk = false;
+            showIncorrectElement(fieldsForCheckInForm[i]);
+          }
+        }
+      } else if (fieldsForCheckInForm[i].type.toLowerCase() === 'number') {
+        if (fieldsForCheckInForm[i].value < 0 || fieldsForCheckInForm[i].value > 1000000 || fieldsForCheckInForm[i].value.length === 0) {
+          formIsOk = false;
+          showIncorrectElement(fieldsForCheckInForm[i]);
+        }
       }
     }
-  };
-
-  /**
-   * Проверка правильности установки количества комнат и гостей
-   * @return {string} - результат проверки
-   */
-  var checkRoomNumber = function () {
-    var result = '';
-    if (selectRoomNumber.value === '1') {
-      if (!(selectCapacity.value === '1')) {
-        result = '1 комната только для одного гостя';
-      } else {
-        result = 'ок';
-      }
-    } else if (selectRoomNumber.value === '2') {
-      if (!(selectCapacity.value === '1' || selectCapacity.value === '2')) {
-        result = '2 комнат только для 2-х или 1-го гостя';
-      } else {
-        result = 'ок';
-      }
-    } else if (selectRoomNumber.value === '3') {
-      if (!(selectCapacity.value === '1' || selectCapacity.value === '2' || selectCapacity.value === '3')) {
-        result = '3 комнат только для 3-х, 2-х или 1-го гостя';
-      } else {
-        result = 'ок';
-      }
-    } else if (selectRoomNumber.value === '100') {
-      if (!(selectCapacity.value === '0')) {
-        result = '100 комнат не для гостей';
-      } else {
-        result = 'ок';
-      }
-    }
-    return result;
-  };
-
-  /**
-   * Обработчик отправки формы
-   */
-  var submitClickHandler = function () {
-    var checkResult = (checkRoomNumber() === 'ок') ? '' : checkRoomNumber();
-    selectRoomNumber.setCustomValidity(checkResult);
-
-    if (newOfferForm.checkValidity()) {
+    if (formIsOk) {
       newOfferForm.submit();
+      newOfferForm.reset();
     }
+  };
+
+  /**
+   * Синхронизация полей формы
+   * @param {object} masterElement - первый элемент, который является инициатором
+   * @param {object} slaveElement - второй элемент, состояние которого необходимо изменить
+   * @param {function} callback - функция сравнения элементов
+   */
+  var synchronizeFields = function (masterElement, slaveElement, callback) {
+    masterElement.addEventListener('change', function () {
+      callback(masterElement, slaveElement);
+    });
+  };
+
+  /**
+   * Синхронизация выпадающих списков со временем
+   * @param {object} elementTimeIn - список со временем заезда
+   * @param {object} elementTimeOut - список со временем выезда
+   */
+  var timeSinc = function (elementTimeIn, elementTimeOut) {
+    elementTimeOut.value = elementTimeIn.value;
+  };
+
+  /**
+   * Синхронизация цены за ночь на основе типа жилья
+   * @param {object} elementApartType - выпадающий список с типом жилья
+   * @param {object} elementPrice - числовое поле с ценой за ночь
+   */
+  var appartPriceSinc = function (elementApartType, elementPrice) {
+    if (elementApartType.value === 'bungalo') {
+      elementPrice.value = BUNGALO_MIN_PRICE_PRE_NIGHT;
+    } else if (elementApartType.value === 'flat') {
+      elementPrice.value = FLAT_MIN_PRICE_PRE_NIGHT;
+    } else if (elementApartType.value === 'house') {
+      elementPrice.value = HOUSE_MIN_PRICE_PRE_NIGHT;
+    } else if (elementApartType.value === 'palace') {
+      elementPrice.value = PALACE_MIN_PRICE_PRE_NIGHT;
+    }
+  };
+
+  /**
+   * Синхронизация выпадающего списка с количеством гостей на основе количества комнат
+   * @param {object} elementRoomsNumber - выпадающий список с количеством комнат
+   * @param {object} elementCapacity - выпадающий список с количеством гостей
+   */
+  var roomNumberCapacitySinc = function (elementRoomsNumber, elementCapacity) {
+    var currentRooms = null;
+    var currentCapacity = null;
+    var options1 = elementRoomsNumber.options;
+    var options2 = elementCapacity.options;
+    for (var i = 0; i < options1.length; i++) {
+      if (options1[i].selected) {
+        currentRooms = +options1[i].value;
+      }
+    }
+
+    for (i = 0; i < options2.length; i++) {
+      currentCapacity = +options2[i].value;
+      options2[i].disabled = false;
+
+      if (currentRooms === 100 && currentCapacity === 0) {
+        options2[i].selected = true;
+      } else if (currentRooms === currentCapacity) {
+        options2[i].selected = true;
+      } else {
+        if (currentCapacity > currentRooms || currentCapacity === 0 || (currentRooms === 100 && currentCapacity !== 0)) {
+          options2[i].disabled = true;
+        }
+      }
+    }
+  };
+
+  /**
+   * Имитация нажатия на типе жилья, чтобы сгенерировать предлагаемую цену за ночь
+   * @param {object} element - элемент, на котором иммитирую выбор нового значения
+   */
+  var simulateChangeEventOnSelect = function (element) {
+    var evt = new Event('change');
+    element.options[0].selected = true;
+    element.dispatchEvent(evt);
   };
 
   var newOfferForm = document.querySelector('form.notice__form');
+  var offerTitle = newOfferForm.querySelector('input[type="text"][name="title"]');
+  var fieldsForCheckInForm = newOfferForm.querySelectorAll('input');
   var selectApartType = newOfferForm.querySelector('select#type');
   var inputPriceForNight = newOfferForm.querySelector('input#price');
   var selectRoomNumber = newOfferForm.querySelector('select#room_number');
   var selectCapacity = newOfferForm.querySelector('select#capacity');
   var selectTimeIn = newOfferForm.querySelector('select#timein');
   var selectTimeOut = newOfferForm.querySelector('select#timeout');
-  var buttonSubmit = newOfferForm.querySelector('button.form__submit');
+  var formIsOk = true;
 
-  newOfferForm.addEventListener('invalid', formValidationHandler, true);
-  selectTimeIn.addEventListener('change', selectChangeHandler);
-  selectTimeOut.addEventListener('change', selectChangeHandler);
-  selectApartType.addEventListener('change', selectChangeHandler);
-  buttonSubmit.addEventListener('click', submitClickHandler);
+  offerTitle.removeAttribute('minLength');
+  offerTitle.removeAttribute('maxLength');
+  offerTitle.removeAttribute('required');
+
+  synchronizeFields(selectApartType, inputPriceForNight, appartPriceSinc);
+  simulateChangeEventOnSelect(selectApartType);
+  synchronizeFields(selectTimeIn, selectTimeOut, timeSinc);
+  synchronizeFields(selectTimeOut, selectTimeIn, timeSinc);
+  synchronizeFields(selectRoomNumber, selectCapacity, roomNumberCapacitySinc);
+  simulateChangeEventOnSelect(selectRoomNumber);
+
+  newOfferForm.addEventListener('submit', submitFormHandler);
 })();

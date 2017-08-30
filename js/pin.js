@@ -5,18 +5,17 @@ window.pin = (function () {
   /**
    * Создание div-блока для нового флажка
    * @param {Object} singleAd - экземпляр объявления
-   * @param  {Object} pin - размеры пин-флажка
    * @param  {boolean} isPinActive - создать данный блок актитвным или нет
    * @return {Element} - div-блок, html узел
    */
-  var createAnotherDiv = function (singleAd, pin, isPinActive) {
+  var createAnotherDiv = function (singleAd, isPinActive) {
     var newDiv = document.createElement('div');
     newDiv.classList.add('pin');
     if (isPinActive) {
       newDiv.classList.add('pin--active');
     }
-    newDiv.style.left = (singleAd.location.x + pin.width / 2) + 'px';
-    newDiv.style.top = (singleAd.location.y + pin.height) + 'px';
+    newDiv.style.left = (singleAd.location.x + pinSize.width / 2) + 'px';
+    newDiv.style.top = (singleAd.location.y + pinSize.height) + 'px';
     newDiv.dataset.id = singleAd.author.avatar + '_' + singleAd.location.x + '_' + singleAd.location.y;
     newDiv.tabIndex = 0;
 
@@ -35,15 +34,15 @@ window.pin = (function () {
    * @param {object} someArray - массив объявлений
    * @param {object} pin - размеры пин-флажка
    */
-  var generateAndShowPinsOfAds = function (someArray, pin) {
+  var generateAndShowPinsOfAds = function (someArray) {
     var someFragment = document.createDocumentFragment();
     var arrayLength = someArray.length;
     for (var i = 0; i < arrayLength; i++) {
-      someFragment.appendChild(createAnotherDiv(someArray[i], pin, i === 0 ? true : false));
+      someFragment.appendChild(createAnotherDiv(someArray[i], i === 0 ? true : false));
     }
     // Отрисовываю сгенерированные объявления на карте
-    window.data.pinMap.appendChild(someFragment);
-    collectionOfPins = window.data.pinMap.querySelectorAll('div[data-id^="img/avatars/user"]');
+    pinMap.appendChild(someFragment);
+    collectionOfPins = pinMap.querySelectorAll('div[data-id^="img/avatars/user"]');
   };
 
   /**
@@ -67,15 +66,20 @@ window.pin = (function () {
     }
   };
 
-  window.data.pinMap.addEventListener('click', pinClickHandler);
-  window.data.pinMap.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === window.data.ENTER_KEYCODE) {
+  var clickedPin = null;
+  var collectionOfPins = null;
+  var pinSize = {
+    width: 56,
+    height: 75
+  };
+  var pinMap = document.querySelector('.tokyo__pin-map');
+
+  pinMap.addEventListener('click', pinClickHandler);
+  pinMap.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === window.utils.ENTER_KEYCODE) {
       pinClickHandler(evt);
     }
   });
-
-  var clickedPin = null;
-  var collectionOfPins = null;
 
   return {
     generateAndShowPinsOfAds: generateAndShowPinsOfAds

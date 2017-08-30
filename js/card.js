@@ -1,6 +1,6 @@
 'use strict';
 
-// Модуль для отрисовки элемента на карточке
+// Модуль для отрисовки объявления в детальном блоке
 window.card = (function () {
   /**
    * На основе шаблона генерирую новый узел с детальным описанием первого объявления
@@ -8,14 +8,24 @@ window.card = (function () {
    * @return {Element} - html узел с детальным описанием объявления
    */
   var createNodeWithDetailInfo = function (singleAd) {
-    var templateOffer = document.getElementById('lodge-template').content;
     var newElement = templateOffer.cloneNode(true);
-
+    var rusLodgeType = null;
+    switch (singleAd.offer.type) {
+      case 'flat':
+        rusLodgeType = 'Квартира';
+        break;
+      case 'bungalo':
+        rusLodgeType = 'Бунгало';
+        break;
+      case 'house':
+        rusLodgeType = 'Дом';
+        break;
+    }
     // Заполняю блок данными из объявления
     newElement.querySelector('.lodge__title').textContent = singleAd.offer.title;
     newElement.querySelector('.lodge__address').textContent = singleAd.offer.address;
     newElement.querySelector('.lodge__price').innerHTML = singleAd.offer.price + '&#x20bd;/ночь'; /* Здесь надо применить именно innerHTML, т.к. код символа рубля можно отобразить только так*/
-    newElement.querySelector('.lodge__type').textContent = window.data.getRusLodgeType(singleAd.offer.type);
+    newElement.querySelector('.lodge__type').textContent = rusLodgeType;
     newElement.querySelector('.lodge__rooms-and-guests').textContent = 'Для ' + singleAd.offer.guests + ' гостей в ' + singleAd.offer.rooms + ' комнатах';
     newElement.querySelector('.lodge__checkin-time').textContent = 'Заезд после ' + singleAd.offer.checkin + ', выезд до ' + singleAd.offer.checkout;
     newElement.querySelector('.lodge__description').textContent = singleAd.description;
@@ -37,11 +47,11 @@ window.card = (function () {
    * @param {integer} numberOfCurrentAd - номер объявления, которое надо отрисовать в детальном виде
    */
   var showAdInDetailView = function (someArray, numberOfCurrentAd) {
-    var oldDialogPanel = document.querySelector('.dialog__panel');
+    var oldDialogPanel = offerDialog.querySelector('.dialog__panel');
     oldDialogPanel.parentElement.replaceChild(createNodeWithDetailInfo(someArray[numberOfCurrentAd]), oldDialogPanel);
 
     // Меняю аватар в блоке с детальным описанием объявления
-    document.getElementById('offer-dialog').querySelector('.dialog__title').querySelector('img').setAttribute('src', someArray[numberOfCurrentAd].author.avatar);
+    offerDialogAvatar.src = someArray[numberOfCurrentAd].author.avatar;
   };
 
   /**
@@ -50,7 +60,7 @@ window.card = (function () {
    */
   var closeOfferClickHandler = function () {
     offerDialog.classList.add('hidden');
-    window.data.pinMap.querySelector('.pin--active').classList.remove('pin--active');
+    pinMap.querySelector('.pin--active').classList.remove('pin--active');
     window.removeEventListener('keydown', closeOfferClickHandlerEscPress);
   };
 
@@ -59,19 +69,21 @@ window.card = (function () {
    * @param {object} evt - данные о событии
    */
   var closeOfferClickHandlerEscPress = function (evt) {
-    if (evt.keyCode === window.data.ESC_KEYCODE) {
+    if (evt.keyCode === window.utils.ESC_KEYCODE) {
       closeOfferClickHandler();
     }
   };
 
   var offerDialog = document.getElementById('offer-dialog');
-  var buttonCloseOffer = document.querySelector('.dialog__close');
+  var buttonCloseOffer = offerDialog.querySelector('.dialog__close');
+  var offerDialogAvatar = offerDialog.querySelector('.dialog__title').querySelector('img');
+  var pinMap = document.querySelector('.tokyo__pin-map');
+  var templateOffer = document.getElementById('lodge-template').content;
 
   buttonCloseOffer.addEventListener('click', closeOfferClickHandler);
 
   window.addEventListener('keydown', closeOfferClickHandlerEscPress);
   return {
-    offerDialog: offerDialog,
     showAdInDetailView: showAdInDetailView,
     closeOfferClickHandlerEscPress: closeOfferClickHandlerEscPress
   };

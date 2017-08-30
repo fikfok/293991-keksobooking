@@ -1,9 +1,12 @@
 'use strict';
 
+var arrayOfAds = window.data.arrayOfAds;
+
 // Генерирую и отрисовываю html-фрагмент на основе массива объявлений
-window.pin.generateAndShowPinsOfAds(window.data.arrayOfAds, window.data.pinSize);
+window.pin.generateAndShowPinsOfAds(arrayOfAds);
 
 // Отрисовываю конкретное объявление в детальном виде
-window.card.showAdInDetailView(window.data.arrayOfAds, 0);
+window.card.showAdInDetailView(arrayOfAds, 0);
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+

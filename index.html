@@ -123,7 +123,7 @@
         <div class="form__panel">
           <div class="form__element  form__element--wide">
             <label for="title">Заголовок объявления</label>
-            <input id="title" name="title" type="text" placeholder="Милая, уютная квартирка, например" minlength="30" maxlength="100" required>
+            <input id="title" name="title" type="text" placeholder="Милая, уютная квартирка, например" minlength="2" maxlength="25" required>
           </div>
           <div class="form__row">
             <div class="form__element">
@@ -137,7 +137,7 @@
             </div>
             <div class="form__element">
               <label for="price">Цена за ночь, руб.</label>
-              <input id="price" name="price" type="number" placeholder="5000" min="1000" max="1000000" value="1000" required>
+              <input id="price" name="price" type="number" placeholder="5000">
             </div>
           </div>
           <div class="form__row">
@@ -168,7 +168,7 @@
         <div class="form__panel">
           <div class="form__element  form__element--wide">
             <label for="address">Адрес</label>
-            <input id="address" name="address" type="text" required>
+            <input id="address" name="address" type="text">
           </div>
           <div class="form__row">
             <div class="form__element">
@@ -279,6 +279,7 @@
   </div>
 </template>
 
+<script src="js/utils.js"></script>
 <script src="js/data.js"></script>
 <script src="js/card.js"></script>
 <script src="js/pin.js"></script>
