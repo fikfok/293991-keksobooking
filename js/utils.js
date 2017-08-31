@@ -3,7 +3,7 @@
 // Модуль, который создает данные
 window.utils = (function () {
   var ESC_KEYCODE = 27;
-  var ENTER_KEYCODE = 13;
+  var pinMap = document.querySelector('.tokyo__pin-map');
 
 
   /**
@@ -49,9 +49,6 @@ window.utils = (function () {
   };
 
   return {
-    ESC_KEYCODE: ESC_KEYCODE,
-    ENTER_KEYCODE: ENTER_KEYCODE,
-
     getAnyElement: getAnyElement,
     getRandomNumber: getRandomNumber,
     getSubArray: getSubArray

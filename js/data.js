@@ -2,6 +2,15 @@
 
 // Модуль, который создает данные
 window.data = (function () {
+  var adsNumber = 8;
+  var offerTitles = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
+  var flatTypes = {
+    en: ['flat', 'house', 'bungalo'],
+    rus: ['Квартира', 'Дом', 'Бунгало']
+  };
+  var checkInOutTimes = ['12:00', '13:00', '14:00'];
+  var additionalFeatures = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+
   /**
    * Генерация массива путей к аватарам
    * @param {integer} numberOfElements - количество элементов в массиве
@@ -14,7 +23,6 @@ window.data = (function () {
     }
     return array;
   };
-
 
   /**
    * Возвращает объект-объявление
@@ -57,15 +65,6 @@ window.data = (function () {
     }
     return someArray;
   };
-
-  var adsNumber = 8;
-  var offerTitles = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
-  var flatTypes = {
-    en: ['flat', 'house', 'bungalo'],
-    rus: ['Квартира', 'Дом', 'Бунгало']
-  };
-  var checkInOutTimes = ['12:00', '13:00', '14:00'];
-  var additionalFeatures = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 
   var userAvatarPaths = generateAvatarImgPath(adsNumber);
 

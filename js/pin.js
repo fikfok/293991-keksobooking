@@ -2,6 +2,15 @@
 
 // Модуль для отрисовки пина и взаимодействия с ним
 window.pin = (function () {
+  var clickedPin = null;
+  var collectionOfPins = null;
+  var pinSize = {
+    width: 56,
+    height: 75
+  };
+  var ENTER_KEYCODE = 13;
+  var pinMap = document.querySelector('.tokyo__pin-map');
+
   /**
    * Создание div-блока для нового флажка
    * @param {Object} singleAd - экземпляр объявления
@@ -37,8 +46,10 @@ window.pin = (function () {
   var generateAndShowPinsOfAds = function (someArray) {
     var someFragment = document.createDocumentFragment();
     var arrayLength = someArray.length;
+    var isPinActive = false;
     for (var i = 0; i < arrayLength; i++) {
-      someFragment.appendChild(createAnotherDiv(someArray[i], i === 0 ? true : false));
+      isPinActive = (i === 0);
+      someFragment.appendChild(createAnotherDiv(someArray[i], isPinActive));
     }
     // Отрисовываю сгенерированные объявления на карте
     pinMap.appendChild(someFragment);
@@ -66,17 +77,9 @@ window.pin = (function () {
     }
   };
 
-  var clickedPin = null;
-  var collectionOfPins = null;
-  var pinSize = {
-    width: 56,
-    height: 75
-  };
-  var pinMap = document.querySelector('.tokyo__pin-map');
-
   pinMap.addEventListener('click', pinClickHandler);
   pinMap.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === window.utils.ENTER_KEYCODE) {
+    if (evt.keyCode === ENTER_KEYCODE) {
       pinClickHandler(evt);
     }
   });

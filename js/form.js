@@ -7,6 +7,15 @@ window.form = (function () {
   var FLAT_MIN_PRICE_PRE_NIGHT = 1000;
   var HOUSE_MIN_PRICE_PRE_NIGHT = 5000;
   var PALACE_MIN_PRICE_PRE_NIGHT = 10000;
+  var newOfferForm = document.querySelector('form.notice__form');
+  var offerTitle = newOfferForm.querySelector('input[type="text"][name="title"]');
+  var selectApartType = newOfferForm.querySelector('select#type');
+  var inputPriceForNight = newOfferForm.querySelector('input#price');
+  var selectRoomNumber = newOfferForm.querySelector('select#room_number');
+  var selectCapacity = newOfferForm.querySelector('select#capacity');
+  var selectTimeIn = newOfferForm.querySelector('select#timein');
+  var selectTimeOut = newOfferForm.querySelector('select#timeout');
+  var formIsOk = true;
 
   /**
    * Обработчик события ввода на элементе
@@ -46,26 +55,30 @@ window.form = (function () {
    */
   var submitFormHandler = function (event) {
     event.preventDefault();
-    var fieldsNumber = fieldsForCheckInForm.length;
-    for (var i = 0; i < fieldsNumber; i++) {
-      fieldsForCheckInForm[i].style.borderColor = null;
+    var elementsInForm = newOfferForm.elements;
+    var fieldsNumber = elementsInForm.length;
 
-      if (fieldsForCheckInForm[i].type.toLowerCase() === 'text') {
-        if (fieldsForCheckInForm[i].name.toLowerCase() === 'title') {
-          if (fieldsForCheckInForm[i].value.length < 30 || fieldsForCheckInForm[i].value.length > 100) {
-            formIsOk = false;
-            showIncorrectElement(fieldsForCheckInForm[i]);
+    for (var i = 0; i < fieldsNumber; i++) {
+      // Проверка текстовых полей
+      if (elementsInForm[i].tagName.toLowerCase() === 'input') {
+        elementsInForm[i].style.borderColor = ''
+        if (elementsInForm[i].type.toLowerCase() === 'text') {
+          if (elementsInForm[i].name.toLowerCase() === 'title') {
+            if (elementsInForm[i].value.length < 30 || elementsInForm[i].value.length > 100) {
+              formIsOk = false;
+              showIncorrectElement(elementsInForm[i]);
+            }
+          } else if (elementsInForm[i].name.toLowerCase() === 'address') {
+            if (elementsInForm[i].value.length === 0) {
+              formIsOk = false;
+              showIncorrectElement(elementsInForm[i]);
+            }
           }
-        } else if (fieldsForCheckInForm[i].name.toLowerCase() === 'address') {
-          if (fieldsForCheckInForm[i].value.length === 0) {
+        } else if (elementsInForm[i].type.toLowerCase() === 'number') {
+          if (elementsInForm[i].value < 0 || elementsInForm[i].value > 1000000 || elementsInForm[i].value.length === 0) {
             formIsOk = false;
-            showIncorrectElement(fieldsForCheckInForm[i]);
+            showIncorrectElement(elementsInForm[i]);
           }
-        }
-      } else if (fieldsForCheckInForm[i].type.toLowerCase() === 'number') {
-        if (fieldsForCheckInForm[i].value < 0 || fieldsForCheckInForm[i].value > 1000000 || fieldsForCheckInForm[i].value.length === 0) {
-          formIsOk = false;
-          showIncorrectElement(fieldsForCheckInForm[i]);
         }
       }
     }
@@ -154,17 +167,6 @@ window.form = (function () {
     element.options[0].selected = true;
     element.dispatchEvent(evt);
   };
-
-  var newOfferForm = document.querySelector('form.notice__form');
-  var offerTitle = newOfferForm.querySelector('input[type="text"][name="title"]');
-  var fieldsForCheckInForm = newOfferForm.querySelectorAll('input');
-  var selectApartType = newOfferForm.querySelector('select#type');
-  var inputPriceForNight = newOfferForm.querySelector('input#price');
-  var selectRoomNumber = newOfferForm.querySelector('select#room_number');
-  var selectCapacity = newOfferForm.querySelector('select#capacity');
-  var selectTimeIn = newOfferForm.querySelector('select#timein');
-  var selectTimeOut = newOfferForm.querySelector('select#timeout');
-  var formIsOk = true;
 
   offerTitle.removeAttribute('minLength');
   offerTitle.removeAttribute('maxLength');

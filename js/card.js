@@ -2,6 +2,13 @@
 
 // Модуль для отрисовки объявления в детальном блоке
 window.card = (function () {
+  var offerDialog = document.getElementById('offer-dialog');
+  var buttonCloseOffer = offerDialog.querySelector('.dialog__close');
+  var offerDialogAvatar = offerDialog.querySelector('.dialog__title img');
+  var pinMap = document.querySelector('.tokyo__pin-map');
+  var templateOffer = document.getElementById('lodge-template').content;
+  var ESC_KEYCODE = 27;
+
   /**
    * На основе шаблона генерирую новый узел с детальным описанием первого объявления
    * @param {Object} singleAd - экземпляр объявления
@@ -69,21 +76,17 @@ window.card = (function () {
    * @param {object} evt - данные о событии
    */
   var closeOfferClickHandlerEscPress = function (evt) {
-    if (evt.keyCode === window.utils.ESC_KEYCODE) {
+    if (evt.keyCode === ESC_KEYCODE) {
       closeOfferClickHandler();
     }
   };
 
-  var offerDialog = document.getElementById('offer-dialog');
-  var buttonCloseOffer = offerDialog.querySelector('.dialog__close');
-  var offerDialogAvatar = offerDialog.querySelector('.dialog__title').querySelector('img');
-  var pinMap = document.querySelector('.tokyo__pin-map');
-  var templateOffer = document.getElementById('lodge-template').content;
-
   buttonCloseOffer.addEventListener('click', closeOfferClickHandler);
-
   window.addEventListener('keydown', closeOfferClickHandlerEscPress);
+
   return {
+    offerDialog: offerDialog,
+
     showAdInDetailView: showAdInDetailView,
     closeOfferClickHandlerEscPress: closeOfferClickHandlerEscPress
   };
