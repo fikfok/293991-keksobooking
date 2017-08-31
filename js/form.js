@@ -61,7 +61,7 @@ window.form = (function () {
     for (var i = 0; i < fieldsNumber; i++) {
       // Проверка текстовых полей
       if (elementsInForm[i].tagName.toLowerCase() === 'input') {
-        elementsInForm[i].style.borderColor = ''
+        elementsInForm[i].style.borderColor = '';
         if (elementsInForm[i].type.toLowerCase() === 'text') {
           if (elementsInForm[i].name.toLowerCase() === 'title') {
             if (elementsInForm[i].value.length < 30 || elementsInForm[i].value.length > 100) {

@@ -2,10 +2,6 @@
 
 // Модуль, который создает данные
 window.utils = (function () {
-  var ESC_KEYCODE = 27;
-  var pinMap = document.querySelector('.tokyo__pin-map');
-
-
   /**
    * Возвращение случайного элемента из переданного массива. Применяется перестановка Фишера
    * @param {Object} arrayOfElements - массив, из которого будет возвращён случайный элемент
