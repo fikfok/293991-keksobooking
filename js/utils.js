@@ -44,9 +44,26 @@ window.utils = (function () {
     return array;
   };
 
+  /**
+   * Возвращает или сам переданный элемент или его первого родителя, у которого есть переданный класс
+   * @param {Object} element - элемент, с которого начинается поиск родителя
+   * @param {string} className - название класса, которое ищется или у самого элемента и у его родителей
+   * @return {*} - или null, в случае если элемент не найден, или элемент, у которого встретился переданный класс
+   */
+  var getSelfOrParentByClass = function (element, className) {
+    do {
+      if (element && element.classList.contains(className)) {
+        return element;
+      }
+      element = element.parentElement;
+    } while (element);
+    return null;
+  };
+
   return {
     getAnyElement: getAnyElement,
     getRandomNumber: getRandomNumber,
-    getSubArray: getSubArray
+    getSubArray: getSubArray,
+    getSelfOrParentByClass: getSelfOrParentByClass
   };
 })();

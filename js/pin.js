@@ -61,7 +61,7 @@ window.pin = (function () {
    * @param {object} evt - данные о событии
    */
   var pinClickHandler = function (evt) {
-    clickedPin = (evt.target.tagName.toLowerCase() === 'img') ? evt.target.parentElement : evt.target;
+    clickedPin = window.utils.getSelfOrParentByClass(evt.target, 'pin');
 
     if (!clickedPin.classList.contains('pin__main')) {
       var childrenNumber = clickedPin.parentElement.children.length;
@@ -77,7 +77,14 @@ window.pin = (function () {
     }
   };
 
-  pinMap.addEventListener('click', pinClickHandler);
+  pinMap.addEventListener('click', function (evt) {
+    // Эта проверка нужна для того, что бы не было ошибки, когда pin__main подвести под обычный pin и отпустить
+    // В таком случае target'ом будет сама карта и при отработки функции pinClickHandler возникнет ошибка и неправильное присвоение класса pin--active
+    if (window.utils.getSelfOrParentByClass(evt.target, 'pin')) {
+      pinClickHandler(evt);
+    }
+  });
+
   pinMap.addEventListener('keydown', function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
       pinClickHandler(evt);
