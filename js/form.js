@@ -9,6 +9,7 @@ window.form = (function () {
   var PALACE_MIN_PRICE_PRE_NIGHT = 10000;
   var newOfferForm = document.querySelector('form.notice__form');
   var offerTitle = newOfferForm.querySelector('input[type="text"][name="title"]');
+  var inputAddress = newOfferForm.querySelector('#address');
   var selectApartType = newOfferForm.querySelector('select#type');
   var inputPriceForNight = newOfferForm.querySelector('input#price');
   var selectRoomNumber = newOfferForm.querySelector('select#room_number');
@@ -16,6 +17,19 @@ window.form = (function () {
   var selectTimeIn = newOfferForm.querySelector('select#timein');
   var selectTimeOut = newOfferForm.querySelector('select#timeout');
   var formIsOk = true;
+  var tokyoBlock = document.querySelector('.tokyo');
+  var tokyoFilterContainer = tokyoBlock.querySelector('.tokyo__filters-container');
+  var pinMain = tokyoBlock.querySelector('.pin__main');
+  var pinMainSize = {
+    width: 74,
+    height: 94
+  };
+  var mapRegion = {
+    xMin: 0 - pinMainSize.width / 2,
+    xMax: tokyoBlock.getBoundingClientRect().width,
+    yMin: 200,
+    yMax: tokyoBlock.getBoundingClientRect().height - tokyoFilterContainer.offsetHeight
+  };
 
   /**
    * Обработчик события ввода на элементе
@@ -69,19 +83,18 @@ window.form = (function () {
               showIncorrectElement(elementsInForm[i]);
             }
           } else if (elementsInForm[i].name.toLowerCase() === 'address') {
-            if (elementsInForm[i].value.length === 0) {
-              formIsOk = false;
-              showIncorrectElement(elementsInForm[i]);
-            }
+            checkAddress(elementsInForm[i]);
           }
         } else if (elementsInForm[i].type.toLowerCase() === 'number') {
-          if (elementsInForm[i].value < 0 || elementsInForm[i].value > 1000000 || elementsInForm[i].value.length === 0) {
+
+          if (elementsInForm[i].value < getAppartPrice(selectApartType.value) || elementsInForm[i].value > 1000000 || elementsInForm[i].value.length === 0) {
             formIsOk = false;
             showIncorrectElement(elementsInForm[i]);
           }
         }
       }
     }
+
     if (formIsOk) {
       newOfferForm.submit();
       newOfferForm.reset();
@@ -115,15 +128,7 @@ window.form = (function () {
    * @param {object} elementPrice - числовое поле с ценой за ночь
    */
   var appartPriceSinc = function (elementApartType, elementPrice) {
-    if (elementApartType.value === 'bungalo') {
-      elementPrice.value = BUNGALO_MIN_PRICE_PRE_NIGHT;
-    } else if (elementApartType.value === 'flat') {
-      elementPrice.value = FLAT_MIN_PRICE_PRE_NIGHT;
-    } else if (elementApartType.value === 'house') {
-      elementPrice.value = HOUSE_MIN_PRICE_PRE_NIGHT;
-    } else if (elementApartType.value === 'palace') {
-      elementPrice.value = PALACE_MIN_PRICE_PRE_NIGHT;
-    }
+    elementPrice.value = getAppartPrice(elementApartType.value);
   };
 
   /**
@@ -168,6 +173,87 @@ window.form = (function () {
     element.dispatchEvent(evt);
   };
 
+  /**
+   * Обработчик ввода данных в поле адресса
+   * @param {object} evt - данные о событии
+   */
+  var addressEnteringHandler = function (evt) {
+    formIsOk = true;
+    checkAddress(evt.target);
+    evt.target.removeEventListener('input', addressEnteringHandler);
+  };
+
+  /**
+   * Обработчик потери фокуса с поля адреса
+   * @param {object} evt - данные о событии
+   */
+  var addressBlurHandler = function (evt) {
+    formIsOk = true;
+    checkAddress(evt.target);
+    evt.target.removeEventListener('blur', addressBlurHandler);
+  };
+
+  /**
+   * Проверка введённого адреса
+   * @param {object} address - поле с введённым адресом
+   */
+  var checkAddress = function (address) {
+    var enteredCoords = {
+      x: null,
+      y: null
+    };
+    var checkedCoords = {
+      x: null,
+      y: null
+    };
+
+    var usersAddress = address.value.match(/^x:\s(\d{1,4}),\sy:\s(\d{1,3})$/i);
+    if (usersAddress) {
+      // Адрес соответствует формату. Но этого мало, надо проверить попадает ли точка в область карты
+      address.style.borderColor = '';
+      enteredCoords.x = usersAddress[1];
+      enteredCoords.y = usersAddress[2];
+      checkedCoords = window.utils.checkPointPosition(mapRegion, enteredCoords);
+      if (enteredCoords.x === checkedCoords.x && enteredCoords.y === checkedCoords.y) {
+        // Точка попала в область карты. Изменяю положение пин-флажка
+        pinMain.style.left = enteredCoords.x - pinMainSize.width / 2 + 'px';
+        pinMain.style.top = enteredCoords.y - pinMainSize.height + 'px';
+      } else {
+        // Точка вне области карты
+        formIsOk = false;
+        address.style.borderColor = RED_COLOR;
+      }
+    } else {
+      // Введённый формат не верен
+      formIsOk = false;
+      address.style.borderColor = RED_COLOR;
+    }
+  };
+
+  /**
+   * Определение цены за ночь в зависимости от типа жилья
+   * @param {string} appartName - название типа жилья
+   * @return {number} - стоимость
+   */
+  var getAppartPrice = function (appartName) {
+    var result = null;
+    switch (appartName) {
+      case 'bungalo':
+        result = BUNGALO_MIN_PRICE_PRE_NIGHT;
+        break;
+      case 'flat':
+        result = FLAT_MIN_PRICE_PRE_NIGHT;
+        break;
+      case 'house':
+        result = HOUSE_MIN_PRICE_PRE_NIGHT;
+        break;
+      case 'palace':
+        result = PALACE_MIN_PRICE_PRE_NIGHT;
+        break;
+    }
+    return result;
+  };
+
   offerTitle.removeAttribute('minLength');
   offerTitle.removeAttribute('maxLength');
   offerTitle.removeAttribute('required');
@@ -179,5 +265,11 @@ window.form = (function () {
   synchronizeFields(selectRoomNumber, selectCapacity, roomNumberCapacitySinc);
   simulateChangeEventOnSelect(selectRoomNumber);
 
+  inputAddress.addEventListener('input', function (evt) {
+    if (inputAddress.value.length > 0) {
+      addressEnteringHandler(evt);
+    }
+  });
+  inputAddress.addEventListener('blur', addressBlurHandler);
   newOfferForm.addEventListener('submit', submitFormHandler);
 })();

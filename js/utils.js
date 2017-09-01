@@ -60,10 +60,35 @@ window.utils = (function () {
     return null;
   };
 
+  /**
+   * Проверка на попадание точки в заданную область
+   * @param {Object} rectangleRegion - область, в которую должна попасть точка
+   * @param {Object} pointPosition - координаты точки
+   * @return {Object} - результат, если точка находится в области, то результат - координаты самой точки, если не входит, то какая-либо координата приравнивается границе области
+   */
+  var checkPointPosition = function (rectangleRegion, pointPosition) {
+    var x = pointPosition.x;
+    var y = pointPosition.y;
+
+    if (pointPosition.x < rectangleRegion.xMin) {
+      x = rectangleRegion.xMin;
+    } else if (pointPosition.x > rectangleRegion.xMax) {
+      x = rectangleRegion.xMax;
+    }
+
+    if (pointPosition.y < rectangleRegion.yMin) {
+      y = rectangleRegion.yMin;
+    } else if (pointPosition.y > rectangleRegion.yMax) {
+      y = rectangleRegion.yMax;
+    }
+    return {x: x, y: y};
+  };
+
   return {
     getAnyElement: getAnyElement,
     getRandomNumber: getRandomNumber,
     getSubArray: getSubArray,
-    getSelfOrParentByClass: getSelfOrParentByClass
+    getSelfOrParentByClass: getSelfOrParentByClass,
+    checkPointPosition: checkPointPosition
   };
 })();
