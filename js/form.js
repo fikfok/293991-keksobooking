@@ -54,11 +54,19 @@ window.form = (function () {
   }
 
   /**
+   * Отметка некорректного поля на форме
+   * @param {object} element - элемент, который надо пометить, что он некорректен
+   */
+  var markIncorrectField = function (element) {
+    element.style.borderColor = RED_COLOR;
+  };
+
+  /**
    * Пометка элементов формы, которые оказались не корректны
    * @param {object} element - элемент, который надо пометить, что он некорректен
    */
   var showIncorrectElement = function (element) {
-    element.style.borderColor = RED_COLOR;
+    markIncorrectField(element);
     element.addEventListener('input', inputEnteringHandler);
     element.addEventListener('blur', inputBlurHandler);
   };
@@ -102,18 +110,6 @@ window.form = (function () {
   };
 
   /**
-   * Синхронизация полей формы
-   * @param {object} masterElement - первый элемент, который является инициатором
-   * @param {object} slaveElement - второй элемент, состояние которого необходимо изменить
-   * @param {function} callback - функция сравнения элементов
-   */
-  var synchronizeFields = function (masterElement, slaveElement, callback) {
-    masterElement.addEventListener('change', function () {
-      callback(masterElement, slaveElement);
-    });
-  };
-
-  /**
    * Синхронизация выпадающих списков со временем
    * @param {object} elementTimeIn - список со временем заезда
    * @param {object} elementTimeOut - список со временем выезда
@@ -128,6 +124,7 @@ window.form = (function () {
    * @param {object} elementPrice - числовое поле с ценой за ночь
    */
   var appartPriceSinc = function (elementApartType, elementPrice) {
+    // elementPrice.min = getAppartPrice(elementApartType.value);
     elementPrice.value = getAppartPrice(elementApartType.value);
   };
 
@@ -221,12 +218,12 @@ window.form = (function () {
       } else {
         // Точка вне области карты
         formIsOk = false;
-        address.style.borderColor = RED_COLOR;
+        markIncorrectField(address);
       }
     } else {
       // Введённый формат не верен
       formIsOk = false;
-      address.style.borderColor = RED_COLOR;
+      markIncorrectField(address);
     }
   };
 
@@ -258,11 +255,11 @@ window.form = (function () {
   offerTitle.removeAttribute('maxLength');
   offerTitle.removeAttribute('required');
 
-  synchronizeFields(selectApartType, inputPriceForNight, appartPriceSinc);
+  window.synchronizeFields(selectApartType, inputPriceForNight, appartPriceSinc);
   simulateChangeEventOnSelect(selectApartType);
-  synchronizeFields(selectTimeIn, selectTimeOut, timeSinc);
-  synchronizeFields(selectTimeOut, selectTimeIn, timeSinc);
-  synchronizeFields(selectRoomNumber, selectCapacity, roomNumberCapacitySinc);
+  window.synchronizeFields(selectTimeIn, selectTimeOut, timeSinc);
+  window.synchronizeFields(selectTimeOut, selectTimeIn, timeSinc);
+  window.synchronizeFields(selectRoomNumber, selectCapacity, roomNumberCapacitySinc);
   simulateChangeEventOnSelect(selectRoomNumber);
 
   inputAddress.addEventListener('input', function (evt) {

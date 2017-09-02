@@ -2,6 +2,9 @@
 
 // Модуль для отрисовки пина и взаимодействия с ним
 window.pin = (function () {
+  var tokyoBlock = document.querySelector('.tokyo');
+  var offerDialog = tokyoBlock.querySelector('#offer-dialog');
+  var pinMap = tokyoBlock.querySelector('.tokyo__pin-map');
   var clickedPin = null;
   var collectionOfPins = null;
   var pinSize = {
@@ -9,7 +12,7 @@ window.pin = (function () {
     height: 75
   };
   var ENTER_KEYCODE = 13;
-  var pinMap = document.querySelector('.tokyo__pin-map');
+
 
   /**
    * Создание div-блока для нового флажка
@@ -71,8 +74,8 @@ window.pin = (function () {
         }
       }
       clickedPin.classList.add('pin--active');
-      window.card.showAdInDetailView(window.data.arrayOfAds, Array.prototype.indexOf.call(collectionOfPins, clickedPin));
-      window.card.offerDialog.classList.remove('hidden');
+      window.showDetailOffer(window.data.arrayOfAds, Array.prototype.indexOf.call(collectionOfPins, clickedPin), offerDialog);
+      offerDialog.classList.remove('hidden');
       window.addEventListener('keydown', window.card.closeOfferClickHandlerEscPress);
     }
   };
