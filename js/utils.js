@@ -44,9 +44,51 @@ window.utils = (function () {
     return array;
   };
 
+  /**
+   * Возвращает или сам переданный элемент или его первого родителя, у которого есть переданный класс
+   * @param {Object} element - элемент, с которого начинается поиск родителя
+   * @param {string} className - название класса, которое ищется или у самого элемента и у его родителей
+   * @return {*} - или null, в случае если элемент не найден, или элемент, у которого встретился переданный класс
+   */
+  var getSelfOrParentByClass = function (element, className) {
+    do {
+      if (element && element.classList.contains(className)) {
+        return element;
+      }
+      element = element.parentElement;
+    } while (element);
+    return null;
+  };
+
+  /**
+   * Проверка на попадание точки в заданную область
+   * @param {Object} rectangleRegion - область, в которую должна попасть точка
+   * @param {Object} pointPosition - координаты точки
+   * @return {Object} - результат, если точка находится в области, то результат - координаты самой точки, если не входит, то какая-либо координата приравнивается границе области
+   */
+  var checkPointPosition = function (rectangleRegion, pointPosition) {
+    var x = pointPosition.x;
+    var y = pointPosition.y;
+
+    if (pointPosition.x < rectangleRegion.xMin) {
+      x = rectangleRegion.xMin;
+    } else if (pointPosition.x > rectangleRegion.xMax) {
+      x = rectangleRegion.xMax;
+    }
+
+    if (pointPosition.y < rectangleRegion.yMin) {
+      y = rectangleRegion.yMin;
+    } else if (pointPosition.y > rectangleRegion.yMax) {
+      y = rectangleRegion.yMax;
+    }
+    return {x: x, y: y};
+  };
+
   return {
     getAnyElement: getAnyElement,
     getRandomNumber: getRandomNumber,
-    getSubArray: getSubArray
+    getSubArray: getSubArray,
+    getSelfOrParentByClass: getSelfOrParentByClass,
+    checkPointPosition: checkPointPosition
   };
 })();
