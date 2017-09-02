@@ -3,6 +3,7 @@
 window.map = (function () {
   var arrayOfAds = window.data.arrayOfAds;
   var tokyoBlock = document.querySelector('.tokyo');
+  var offerDialog = tokyoBlock.querySelector('#offer-dialog');
   var tokyoFilterContainer = tokyoBlock.querySelector('.tokyo__filters-container');
   var pinMain = tokyoBlock.querySelector('.pin__main');
   var inputOfferAddress = document.getElementById('address');
@@ -10,7 +11,6 @@ window.map = (function () {
     width: 74,
     height: 94
   };
-
   var mapRegion = {
     xMin: 0 - pinMainSize.width / 2,
     xMax: tokyoBlock.getBoundingClientRect().width - pinMainSize.width / 2,
@@ -22,8 +22,7 @@ window.map = (function () {
   window.pin.generateAndShowPinsOfAds(arrayOfAds);
 
   // Отрисовываю конкретное объявление в детальном виде
-  window.card.showAdInDetailView(arrayOfAds, 0);
-
+  window.showDetailOffer(arrayOfAds, 0, offerDialog);
   tokyoBlock.style.overflow = 'hidden';
 
   /**
