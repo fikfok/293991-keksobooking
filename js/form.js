@@ -38,9 +38,11 @@ window.form = (function () {
     roomNumber: 1,
     capacity: 1,
     description: '',
-    address: '',
+    address: 'x: ' + (pinMain.offsetLeft + pinMainSize.width / 2) + ', ' + 'y: ' + (pinMain.offsetTop + pinMainSize.height),
     timeIn: '12:00',
-    timeOut: '12:00'
+    timeOut: '12:00',
+    pinMainX: pinMain.offsetLeft,
+    pinMainY: pinMain.offsetTop
   };
 
   /**
@@ -281,6 +283,9 @@ window.form = (function () {
     inputAddress.value = defaultData.address;
     selectTimeIn.value = defaultData.timeIn;
     selectTimeOut.value = defaultData.timeOut;
+
+    pinMain.style.left = defaultData.pinMainX + 'px';
+    pinMain.style.top = defaultData.pinMainY + 'px';
   };
 
   offerTitle.removeAttribute('minLength');
