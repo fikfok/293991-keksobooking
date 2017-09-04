@@ -7,7 +7,7 @@ window.backend = (function () {
   var save = function (data, onLoad, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
-    xhr.timeout = 5000;
+    xhr.timeout = 10;
 
     xhr.addEventListener('load', function () {
       if (xhr.status === 200) {
@@ -31,7 +31,7 @@ window.backend = (function () {
   var load = function (onLoad, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
-    xhr.timeout = 5000;
+    xhr.timeout = 10;
 
     xhr.addEventListener('load', function () {
       if (xhr.status === 200) {
