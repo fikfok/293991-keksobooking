@@ -51,6 +51,7 @@ window.showCard = (function () {
    */
   window.showDetailOffer = function (someArray, numberOfCurrentAd, offerDialog) {
     var detailViewPanel = offerDialog.querySelector('.dialog__panel');
+
     detailViewPanel.parentElement.replaceChild(createNodeWithDetailInfo(someArray[numberOfCurrentAd]), detailViewPanel);
 
     // Меняю аватар в блоке с детальным описанием объявления

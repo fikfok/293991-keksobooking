@@ -26,8 +26,8 @@ window.pin = (function () {
     if (isPinActive) {
       newDiv.classList.add('pin--active');
     }
-    newDiv.style.left = (singleAd.location.x + pinSize.width / 2) + 'px';
-    newDiv.style.top = (singleAd.location.y + pinSize.height) + 'px';
+    newDiv.style.left = (singleAd.location.x - pinSize.width / 2) + 'px';
+    newDiv.style.top = (singleAd.location.y - pinSize.height) + 'px';
     newDiv.dataset.id = singleAd.author.avatar + '_' + singleAd.location.x + '_' + singleAd.location.y;
     newDiv.tabIndex = 0;
 
@@ -46,7 +46,9 @@ window.pin = (function () {
    * @param {object} someArray - массив объявлений
    * @param {object} pin - размеры пин-флажка
    */
-  var generateAndShowPinsOfAds = function (someArray) {
+  var showPins = function (someArray) {
+    window.ar = someArray;
+
     var someFragment = document.createDocumentFragment();
     var arrayLength = someArray.length;
     var isPinActive = false;
@@ -56,7 +58,7 @@ window.pin = (function () {
     }
     // Отрисовываю сгенерированные объявления на карте
     pinMap.appendChild(someFragment);
-    collectionOfPins = pinMap.querySelectorAll('div[data-id^="img/avatars/user"]');
+    collectionOfPins = pinMap.querySelectorAll('div[data-id^="img/avatars/"]');
   };
 
   /**
@@ -74,7 +76,7 @@ window.pin = (function () {
         }
       }
       clickedPin.classList.add('pin--active');
-      window.showDetailOffer(window.data.arrayOfAds, Array.prototype.indexOf.call(collectionOfPins, clickedPin), offerDialog);
+      window.showDetailOffer(window.arrayOfAds, Array.prototype.indexOf.call(collectionOfPins, clickedPin), offerDialog);
       offerDialog.classList.remove('hidden');
       window.addEventListener('keydown', window.card.closeOfferClickHandlerEscPress);
     }
@@ -95,6 +97,6 @@ window.pin = (function () {
   });
 
   return {
-    generateAndShowPinsOfAds: generateAndShowPinsOfAds
+    showPins: showPins
   };
 })();

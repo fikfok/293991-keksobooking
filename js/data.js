@@ -69,9 +69,9 @@ window.data = (function () {
   var userAvatarPaths = generateAvatarImgPath(adsNumber);
 
   // Генерация массива объявляений
-  var arrayOfAds = createArrayOfAds(adsNumber);
+  var arrayOfAdsNotForUse = createArrayOfAds(adsNumber);
 
   return {
-    arrayOfAds: arrayOfAds
+    arrayOfAdsNotForUse: arrayOfAdsNotForUse
   };
 })();

@@ -84,11 +84,28 @@ window.utils = (function () {
     return {x: x, y: y};
   };
 
+  /**
+   * Вывод сообщения с ошибкой при отправке/получении ajax запроса
+   * @param {string} errorMessage - сообщение с ошибкой
+   * @constructor
+   */
+  var AJAXErrorHandler = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin-top: 250px; width: 1200px; margin-left: auto; margin-right: auto; text-align: center; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
   return {
     getAnyElement: getAnyElement,
     getRandomNumber: getRandomNumber,
     getSubArray: getSubArray,
     getSelfOrParentByClass: getSelfOrParentByClass,
-    checkPointPosition: checkPointPosition
+    checkPointPosition: checkPointPosition,
+    AJAXErrorHandler: AJAXErrorHandler
   };
 })();

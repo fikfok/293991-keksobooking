@@ -1,7 +1,6 @@
 'use strict';
 
 window.map = (function () {
-  var arrayOfAds = window.data.arrayOfAds;
   var tokyoBlock = document.querySelector('.tokyo');
   var offerDialog = tokyoBlock.querySelector('#offer-dialog');
   var tokyoFilterContainer = tokyoBlock.querySelector('.tokyo__filters-container');
@@ -17,13 +16,6 @@ window.map = (function () {
     yMin: 200 - pinMainSize.height,
     yMax: tokyoBlock.getBoundingClientRect().height - pinMainSize.height - tokyoFilterContainer.offsetHeight
   };
-
-  // Генерирую и отрисовываю html-фрагмент на основе массива объявлений
-  window.pin.generateAndShowPinsOfAds(arrayOfAds);
-
-  // Отрисовываю конкретное объявление в детальном виде
-  window.showDetailOffer(arrayOfAds, 0, offerDialog);
-  tokyoBlock.style.overflow = 'hidden';
 
   /**
    * Обработчик нажатия клавиши мыши
@@ -92,5 +84,17 @@ window.map = (function () {
     document.addEventListener('mouseup', mouseUpHandler);
   });
 
+  var getData = function (data) {
+    window.arrayOfAds = data;
+    window.pin.showPins(window.arrayOfAds);
+  };
+
+  offerDialog.classList.add('hidden');
+
+  // Генерирую и отрисовываю html-фрагмент на основе массива объявлений
+  window.backend.load(getData, window.utils.AJAXErrorHandler);
+
+  tokyoBlock.style.overflow = 'hidden';
   inputOfferAddress.value = 'x: ' + (pinMain.offsetLeft + pinMainSize.width / 2) + ', ' + 'y: ' + (pinMain.offsetTop + pinMainSize.height);
+
 })();

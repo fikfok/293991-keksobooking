@@ -16,6 +16,7 @@ window.form = (function () {
   var selectCapacity = newOfferForm.querySelector('select#capacity');
   var selectTimeIn = newOfferForm.querySelector('select#timein');
   var selectTimeOut = newOfferForm.querySelector('select#timeout');
+  var textareaDescription = newOfferForm.querySelector('textarea#description');
   var formIsOk = true;
   var tokyoBlock = document.querySelector('.tokyo');
   var tokyoFilterContainer = tokyoBlock.querySelector('.tokyo__filters-container');
@@ -29,6 +30,17 @@ window.form = (function () {
     xMax: tokyoBlock.getBoundingClientRect().width,
     yMin: 200,
     yMax: tokyoBlock.getBoundingClientRect().height - tokyoFilterContainer.offsetHeight
+  };
+  var defaultValuesForOffer = {
+    title: '',
+    type: 'flat',
+    price: 1000,
+    roomNumber: 1,
+    capacity: 1,
+    description: '',
+    address: '',
+    timeIn: '12:00',
+    timeOut: '12:00'
   };
 
   /**
@@ -104,8 +116,12 @@ window.form = (function () {
     }
 
     if (formIsOk) {
-      newOfferForm.submit();
-      newOfferForm.reset();
+      window.backend.save(new FormData(newOfferForm), function () {
+        newOfferForm.reset();
+        fillFormByDefaultValues(defaultValuesForOffer);
+      },
+      window.utils.AJAXErrorHandler
+      );
     }
   };
 
@@ -249,6 +265,22 @@ window.form = (function () {
         break;
     }
     return result;
+  };
+
+  /**
+   * Сброс формы в первоначальное состояние
+   * @param {object} defaultData - дефолтные данные контролов в форме оффера
+   */
+  var fillFormByDefaultValues = function (defaultData) {
+    offerTitle.value = defaultData.title;
+    selectApartType.value = defaultData.type;
+    inputPriceForNight.value = defaultData.price;
+    selectRoomNumber.value = defaultData.roomNumber;
+    selectCapacity.value = defaultData.capacity;
+    textareaDescription.value = defaultData.description;
+    inputAddress.value = defaultData.address;
+    selectTimeIn.value = defaultData.timeIn;
+    selectTimeOut.value = defaultData.timeOut;
   };
 
   offerTitle.removeAttribute('minLength');
