@@ -95,23 +95,24 @@ window.utils = (function () {
       var node = document.createElement('div');
       node.style.cssText = 'z-index: 100; margin-top: 250px; width: 1200px; margin-left: auto;';
       node.style.cssText += 'margin-right: auto; text-align: center; background-color: red;';
-      // node.style.cssText += 'animation: cssAnimation 0s ease-in 1s forwards;';
-      // node.style.cssText += '@keyframes cssAnimation {to {width:0; height:0; overflow:hidden;}}';
       node.style.position = 'absolute';
       node.style.left = 0;
       node.style.right = 0;
       node.style.fontSize = '30px';
       node.classList.add('ajax-error-message');
-
-      node.addEventListener('click', addHiddenClass);
       node.textContent = errorMessage;
       document.body.insertAdjacentElement('afterbegin', node);
+    } else {
+      errorMessageNode.textContent = errorMessage;
+      errorMessageNode.classList.remove('hidden');
     }
+    window.addEventListener('click', addHiddenClassErrorMessage);
   };
 
-  var addHiddenClass = function (evt) {
-    evt.target.classList.add('hidden');
-    evt.target.removeEventListener('click', addHiddenClass);
+  var addHiddenClassErrorMessage = function () {
+    var errorMessageNode = document.querySelector('.ajax-error-message');
+    errorMessageNode.classList.add('hidden');
+    window.removeEventListener('click', addHiddenClassErrorMessage);
   };
 
   return {
