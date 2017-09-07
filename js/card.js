@@ -11,10 +11,13 @@ window.card = (function () {
    * @param {object} evt - данные о событии
    */
   var closeOffer = function () {
-    offerDialog.classList.add('hidden');
-    pinMap.querySelector('.pin--active').classList.remove('pin--active');
-    buttonCloseOffer.removeEventListener('click', window.utils.clickHandler(closeOffer));
-    window.removeEventListener('keydown', window.utils.escPressHandler(closeOffer));
+    if (!offerDialog.classList.contains('hidden')) {
+      offerDialog.classList.add('hidden');
+    }
+    var activePin = pinMap.querySelector('.pin--active');
+    if (activePin) {
+      activePin.classList.remove('pin--active');
+    }
   };
 
   buttonCloseOffer.addEventListener('click', window.utils.clickHandler(closeOffer));

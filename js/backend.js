@@ -5,39 +5,49 @@ window.backend = (function () {
   var SERVER_URL = 'https://1510.dump.academy/keksobooking';
   var TIMEOUT = 10000;
   var RESPONSE_TYPE = 'json';
+  var errorMessageNode = null;
 
   /**
-   * Вывод сообщения с ошибкой при отправке/получении ajax запроса
+   * Создание html-узла с сообщением об ошибке в XMLHttpRequest запросе
+   * @return {object} - html-узел
+   */
+  var createRequestErrorBlock = function () {
+    var node = document.createElement('div');
+    node.style.zIndex = 100;
+    node.style.marginTop = '250px';
+    node.style.marginLeft = 'auto';
+    node.style.marginRight = 'auto';
+    node.style.width = '1200px';
+    node.style.textAlign = 'center';
+    node.style.backgroundColor = 'red';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+    node.classList.add('ajax-error-message');
+    document.body.insertAdjacentElement('afterbegin', node);
+    return node;
+  };
+
+  /**
+   * Вывод сообщения с ошибкой при отправке/получении XMLHttpRequest запроса
    * @param {string} errorMessage - сообщение с ошибкой
    * @constructor
    */
-  var showRequestError = function (errorMessage) {
-    var errorMessageNode = document.querySelector('.ajax-error-message');
-    if (!errorMessageNode) {
-      var node = document.createElement('div');
-      node.style.cssText = 'z-index: 100; margin-top: 250px; width: 1200px; margin-left: auto;';
-      node.style.cssText += 'margin-right: auto; text-align: center; background-color: red;';
-      node.style.position = 'absolute';
-      node.style.left = 0;
-      node.style.right = 0;
-      node.style.fontSize = '30px';
-      node.classList.add('ajax-error-message');
-      node.textContent = errorMessage;
-      document.body.insertAdjacentElement('afterbegin', node);
-    } else {
-      errorMessageNode.textContent = errorMessage;
-      errorMessageNode.classList.remove('hidden');
-    }
-    window.addEventListener('click', window.utils.clickHandler(closeRequestError));
+  var showRequestErrorBlock = function (errorMessage) {
+    errorMessageNode.textContent = errorMessage;
+    errorMessageNode.classList.remove('hidden');
+    window.addEventListener('click', window.utils.clickHandler(closeRequestErrorBlock));
+    window.addEventListener('keydown', window.utils.escPressHandler(closeRequestErrorBlock));
   };
 
   /**
    * Закрытие сообщения с ошибкой, возникшей при XMLHttpRequest запросе
    */
-  var closeRequestError = function () {
-    var errorMessageNode = document.querySelector('.ajax-error-message');
+  var closeRequestErrorBlock = function () {
     errorMessageNode.classList.add('hidden');
-    window.removeEventListener('click', window.utils.clickHandler(closeRequestError));
+    window.removeEventListener('click', window.utils.clickHandler(closeRequestErrorBlock));
+    window.removeEventListener('keydown', window.utils.escPressHandler(closeRequestErrorBlock));
   };
 
   /**
@@ -116,9 +126,11 @@ window.backend = (function () {
     }
   };
 
+  errorMessageNode = createRequestErrorBlock();
+
   return {
     load: load,
     save: save,
-    showRequestError: showRequestError
+    showRequestError: showRequestErrorBlock
   };
 })();

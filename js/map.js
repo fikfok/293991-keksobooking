@@ -61,6 +61,7 @@ window.map = (function () {
       pointPosition = window.utils.checkPointPosition(mapRegion, pointPosition);
 
       pinMain.style.left = pointPosition.x + 'px';
+      pinMain.style.top = pointPosition.y + 'px';      pinMain.style.left = pointPosition.x + 'px';
       pinMain.style.top = pointPosition.y + 'px';
 
       trueX = Math.floor(pointPosition.x + pinMainSize.width / 2);
@@ -88,15 +89,15 @@ window.map = (function () {
     if (Object.prototype.toString.call(data) === '[object Array]') {
       window.arrayOfAds = data;
       window.pin.showPins(window.arrayOfAds);
+      window.card.closeOffer();
     } else {
       throw new Error('Полученный ответ от сервера не является массивом');
     }
   };
 
-  offerDialog.classList.add('hidden');
-
   // Генерирую и отрисовываю html-фрагмент на основе массива объявлений
   window.backend.load(getData, window.backend.showRequestError);
+  window.card.closeOffer();
 
   tokyoBlock.style.overflow = 'hidden';
   inputOfferAddress.value = 'x: ' + (pinMain.offsetLeft + pinMainSize.width / 2) + ', ' + 'y: ' + (pinMain.offsetTop + pinMainSize.height);

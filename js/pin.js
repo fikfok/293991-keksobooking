@@ -76,9 +76,6 @@ window.pin = (function () {
       clickedPin.classList.add('pin--active');
       window.showDetailOffer(window.arrayOfAds, Array.prototype.indexOf.call(collectionOfPins, clickedPin), offerDialog);
       offerDialog.classList.remove('hidden');
-      // window.addEventListener('keydown', window.utils.escPressHandler(window.card.closeOffer));
-      pinMap.removeEventListener('click', window.utils.clickHandler(activatePin));
-      pinMap.removeEventListener('keydown', window.utils.enterPressHandler(activatePin));
     }
   };
 

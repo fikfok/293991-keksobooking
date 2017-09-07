@@ -51,7 +51,6 @@ window.utils = (function () {
    * @return {*} - iife функция, запускающая callback функцию
    */
   var clickHandler = function (callback) {
-    console.log(callback)
     if (!checkCallback(callback)) {
       return false;
     }
@@ -66,7 +65,6 @@ window.utils = (function () {
    * @return {*} - iife функция, запускающая callback функцию
    */
   var enterPressHandler = function (callback) {
-    console.log(callback)
     if (!checkCallback(callback)) {
       return false;
     }
