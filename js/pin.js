@@ -11,8 +11,6 @@ window.pin = (function () {
     width: 56,
     height: 75
   };
-  var ENTER_KEYCODE = 13;
-
 
   /**
    * Создание div-блока для нового флажка
@@ -47,8 +45,6 @@ window.pin = (function () {
    * @param {object} pin - размеры пин-флажка
    */
   var showPins = function (someArray) {
-    window.ar = someArray;
-
     var someFragment = document.createDocumentFragment();
     var arrayLength = someArray.length;
     var isPinActive = false;
@@ -65,10 +61,12 @@ window.pin = (function () {
    * Обработчик события нажатия на пин-флажок. Отслеживается клик мыши и нажатие Enter
    * @param {object} evt - данные о событии
    */
-  var pinClickHandler = function (evt) {
+  var activatePin = function (evt) {
     clickedPin = window.utils.getSelfOrParentByClass(evt.target, 'pin');
-
-    if (!clickedPin.classList.contains('pin__main')) {
+    // Наличие в if'е clickedPin необходимо на тот случай, если pin__main подвести под обычный pin и отпустить,
+    // то target'ом будет сама карта и при отработки этой функции
+    // возникнет ошибка и неправильное присвоение класса pin--active
+    if (clickedPin && !clickedPin.classList.contains('pin__main')) {
       var childrenNumber = clickedPin.parentElement.children.length;
       for (var i = 0; i < childrenNumber; i++) {
         if (clickedPin.parentElement.children[i].classList.contains('pin--active')) {
@@ -78,23 +76,14 @@ window.pin = (function () {
       clickedPin.classList.add('pin--active');
       window.showDetailOffer(window.arrayOfAds, Array.prototype.indexOf.call(collectionOfPins, clickedPin), offerDialog);
       offerDialog.classList.remove('hidden');
-      window.addEventListener('keydown', window.card.closeOfferClickHandlerEscPress);
+      // window.addEventListener('keydown', window.utils.escPressHandler(window.card.closeOffer));
+      pinMap.removeEventListener('click', window.utils.clickHandler(activatePin));
+      pinMap.removeEventListener('keydown', window.utils.enterPressHandler(activatePin));
     }
   };
 
-  pinMap.addEventListener('click', function (evt) {
-    // Эта проверка нужна для того, что бы не было ошибки, когда pin__main подвести под обычный pin и отпустить
-    // В таком случае target'ом будет сама карта и при отработки функции pinClickHandler возникнет ошибка и неправильное присвоение класса pin--active
-    if (window.utils.getSelfOrParentByClass(evt.target, 'pin')) {
-      pinClickHandler(evt);
-    }
-  });
-
-  pinMap.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      pinClickHandler(evt);
-    }
-  });
+  pinMap.addEventListener('click', window.utils.clickHandler(activatePin));
+  pinMap.addEventListener('keydown', window.utils.enterPressHandler(activatePin));
 
   return {
     showPins: showPins

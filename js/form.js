@@ -8,15 +8,6 @@ window.form = (function () {
   var HOUSE_MIN_PRICE_PRE_NIGHT = 5000;
   var PALACE_MIN_PRICE_PRE_NIGHT = 10000;
   var newOfferForm = document.querySelector('form.notice__form');
-  var offerTitle = newOfferForm.querySelector('input[type="text"][name="title"]');
-  var inputAddress = newOfferForm.querySelector('#address');
-  var selectApartType = newOfferForm.querySelector('select#type');
-  var inputPriceForNight = newOfferForm.querySelector('input#price');
-  var selectRoomNumber = newOfferForm.querySelector('select#room_number');
-  var selectCapacity = newOfferForm.querySelector('select#capacity');
-  var selectTimeIn = newOfferForm.querySelector('select#timein');
-  var selectTimeOut = newOfferForm.querySelector('select#timeout');
-  var textareaDescription = newOfferForm.querySelector('textarea#description');
   var formIsOk = true;
   var tokyoBlock = document.querySelector('.tokyo');
   var tokyoFilterContainer = tokyoBlock.querySelector('.tokyo__filters-container');
@@ -25,24 +16,16 @@ window.form = (function () {
     width: 74,
     height: 94
   };
+  var pinMainStartPosition = {
+    x: pinMain.offsetLeft,
+    y: pinMain.offsetTop
+  };
+
   var mapRegion = {
     xMin: 0 - pinMainSize.width / 2,
     xMax: tokyoBlock.getBoundingClientRect().width,
     yMin: 200,
     yMax: tokyoBlock.getBoundingClientRect().height - tokyoFilterContainer.offsetHeight
-  };
-  var defaultValuesForOffer = {
-    title: '',
-    type: 'flat',
-    price: 1000,
-    roomNumber: 1,
-    capacity: 1,
-    description: '',
-    address: 'x: ' + (pinMain.offsetLeft + pinMainSize.width / 2) + ', ' + 'y: ' + (pinMain.offsetTop + pinMainSize.height),
-    timeIn: '12:00',
-    timeOut: '12:00',
-    pinMainX: pinMain.offsetLeft,
-    pinMainY: pinMain.offsetTop
   };
 
   /**
@@ -109,7 +92,7 @@ window.form = (function () {
           }
         } else if (elementsInForm[i].type.toLowerCase() === 'number') {
 
-          if (elementsInForm[i].value < getAppartPrice(selectApartType.value) || elementsInForm[i].value > 1000000 || elementsInForm[i].value.length === 0) {
+          if (elementsInForm[i].value < getAppartPrice(newOfferForm.type.value) || elementsInForm[i].value > 1000000 || elementsInForm[i].value.length === 0) {
             formIsOk = false;
             showIncorrectElement(elementsInForm[i]);
           }
@@ -120,7 +103,7 @@ window.form = (function () {
     if (formIsOk) {
       window.backend.save(new FormData(newOfferForm), function () {
         newOfferForm.reset();
-        fillFormByDefaultValues(defaultValuesForOffer);
+        resetFormToDefault();
       },
       window.utils.AJAXErrorHandler
       );
@@ -142,7 +125,6 @@ window.form = (function () {
    * @param {object} elementPrice - числовое поле с ценой за ночь
    */
   var appartPriceSinc = function (elementApartType, elementPrice) {
-    // elementPrice.min = getAppartPrice(elementApartType.value);
     elementPrice.value = getAppartPrice(elementApartType.value);
   };
 
@@ -180,10 +162,11 @@ window.form = (function () {
 
   /**
    * Имитация нажатия на типе жилья, чтобы сгенерировать предлагаемую цену за ночь
+   * @param {string} eventType - тип события
    * @param {object} element - элемент, на котором иммитирую выбор нового значения
    */
-  var simulateChangeEventOnSelect = function (element) {
-    var evt = new Event('change');
+  var simulateChangeEventOnSelect = function (eventType, element) {
+    var evt = new Event(eventType);
     element.options[0].selected = true;
     element.dispatchEvent(evt);
   };
@@ -271,39 +254,32 @@ window.form = (function () {
 
   /**
    * Сброс формы в первоначальное состояние
-   * @param {object} defaultData - дефолтные данные контролов в форме оффера
    */
-  var fillFormByDefaultValues = function (defaultData) {
-    offerTitle.value = defaultData.title;
-    selectApartType.value = defaultData.type;
-    inputPriceForNight.value = defaultData.price;
-    selectRoomNumber.value = defaultData.roomNumber;
-    selectCapacity.value = defaultData.capacity;
-    textareaDescription.value = defaultData.description;
-    inputAddress.value = defaultData.address;
-    selectTimeIn.value = defaultData.timeIn;
-    selectTimeOut.value = defaultData.timeOut;
+  var resetFormToDefault = function () {
+    simulateChangeEventOnSelect('change', newOfferForm.type);
+    simulateChangeEventOnSelect('change', newOfferForm.rooms);
+    simulateChangeEventOnSelect('change', newOfferForm.timein);
 
-    pinMain.style.left = defaultData.pinMainX + 'px';
-    pinMain.style.top = defaultData.pinMainY + 'px';
+    pinMain.style.left = pinMainStartPosition.x + 'px';
+    pinMain.style.top = pinMainStartPosition.y + 'px';
+    newOfferForm.address.value = 'x: ' + (pinMain.offsetLeft + pinMainSize.width / 2) + ', ' + 'y: ' + (pinMain.offsetTop + pinMainSize.height);
   };
 
-  offerTitle.removeAttribute('minLength');
-  offerTitle.removeAttribute('maxLength');
-  offerTitle.removeAttribute('required');
+  newOfferForm.title.removeAttribute('minLength');
+  newOfferForm.title.removeAttribute('maxLength');
+  newOfferForm.title.removeAttribute('required');
 
-  window.synchronizeFields(selectApartType, inputPriceForNight, appartPriceSinc);
-  simulateChangeEventOnSelect(selectApartType);
-  window.synchronizeFields(selectTimeIn, selectTimeOut, timeSinc);
-  window.synchronizeFields(selectTimeOut, selectTimeIn, timeSinc);
-  window.synchronizeFields(selectRoomNumber, selectCapacity, roomNumberCapacitySinc);
-  simulateChangeEventOnSelect(selectRoomNumber);
+  window.synchronizeFields(newOfferForm.type, newOfferForm.price, appartPriceSinc);
+  window.synchronizeFields(newOfferForm.timein, newOfferForm.timeout, timeSinc);
+  window.synchronizeFields(newOfferForm.timeout, newOfferForm.timein, timeSinc);
+  window.synchronizeFields(newOfferForm.rooms, newOfferForm.capacity, roomNumberCapacitySinc);
+  resetFormToDefault();
 
-  inputAddress.addEventListener('input', function (evt) {
-    if (inputAddress.value.length > 0) {
+  newOfferForm.address.addEventListener('input', function (evt) {
+    if (newOfferForm.address.value.length > 0) {
       addressEnteringHandler(evt);
     }
   });
-  inputAddress.addEventListener('blur', addressBlurHandler);
+  newOfferForm.address.addEventListener('blur', addressBlurHandler);
   newOfferForm.addEventListener('submit', submitFormHandler);
 })();

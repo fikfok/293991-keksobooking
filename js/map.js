@@ -85,14 +85,18 @@ window.map = (function () {
   });
 
   var getData = function (data) {
-    window.arrayOfAds = data;
-    window.pin.showPins(window.arrayOfAds);
+    if (Object.prototype.toString.call(data) === '[object Array]') {
+      window.arrayOfAds = data;
+      window.pin.showPins(window.arrayOfAds);
+    } else {
+      throw new Error('Полученный ответ от сервера не является массивом');
+    }
   };
 
   offerDialog.classList.add('hidden');
 
   // Генерирую и отрисовываю html-фрагмент на основе массива объявлений
-  window.backend.load(getData, window.utils.AJAXErrorHandler);
+  window.backend.load(getData, window.backend.showRequestError);
 
   tokyoBlock.style.overflow = 'hidden';
   inputOfferAddress.value = 'x: ' + (pinMain.offsetLeft + pinMainSize.width / 2) + ', ' + 'y: ' + (pinMain.offsetTop + pinMainSize.height);

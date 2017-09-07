@@ -2,47 +2,8 @@
 
 // Модуль, который создает данные
 window.utils = (function () {
-  /**
-   * Возвращение случайного элемента из переданного массива. Применяется перестановка Фишера
-   * @param {Object} arrayOfElements - массив, из которого будет возвращён случайный элемент
-   * @param {boolean} isUnique - признак: использовать перестановку Фишера или нет
-   * @param {integer} startIndex - стартовый элемент массива, с которого будет осуществляться случайный выбор. Используется дл перестановки Фишера
-   * @return {*}
-   */
-  var getAnyElement = function (arrayOfElements, isUnique, startIndex) {
-    var elementPosition = getRandomNumber(arrayOfElements.length - 1, startIndex);
-    var element = arrayOfElements[elementPosition];
-    if (isUnique) {
-      var tmp = arrayOfElements[startIndex];
-      arrayOfElements[startIndex] = element;
-      arrayOfElements[elementPosition] = tmp;
-    }
-    return element;
-  };
-
-  /**
-   * Возвращает случайное число из диапазона
-   * @param {integer} max - максимальная граница
-   * @param {integer} min - минимальная граница
-   * @return {number} - случайное число
-   */
-  var getRandomNumber = function (max, min) {
-    return Math.round(Math.random() * (max - min) + min);
-  };
-
-  /**
-  * Возвращает массив случаной длины, содержащий доп. опции
-  * @param {Object} arrayOfElements - полный массив доп. опций
-  * @return {Array}
-  */
-  var getSubArray = function (arrayOfElements) {
-    var array = [];
-    var maxNumber = getRandomNumber(arrayOfElements.length, 1);
-    for (var i = 0; i < maxNumber; i++) {
-      array.push(getAnyElement(arrayOfElements, true, i));
-    }
-    return array;
-  };
+  var ENTER_KEYCODE = 13;
+  var ESC_KEYCODE = 27;
 
   /**
    * Возвращает или сам переданный элемент или его первого родителя, у которого есть переданный класс
@@ -85,42 +46,90 @@ window.utils = (function () {
   };
 
   /**
-   * Вывод сообщения с ошибкой при отправке/получении ajax запроса
-   * @param {string} errorMessage - сообщение с ошибкой
-   * @constructor
+   * Обработчик события клика
+   * @param {function} callback - callback-функция
+   * @return {*} - iife функция, запускающая callback функцию
    */
-  var AJAXErrorHandler = function (errorMessage) {
-    var errorMessageNode = document.querySelector('.ajax-error-message');
-    if (!errorMessageNode) {
-      var node = document.createElement('div');
-      node.style.cssText = 'z-index: 100; margin-top: 250px; width: 1200px; margin-left: auto;';
-      node.style.cssText += 'margin-right: auto; text-align: center; background-color: red;';
-      node.style.position = 'absolute';
-      node.style.left = 0;
-      node.style.right = 0;
-      node.style.fontSize = '30px';
-      node.classList.add('ajax-error-message');
-      node.textContent = errorMessage;
-      document.body.insertAdjacentElement('afterbegin', node);
-    } else {
-      errorMessageNode.textContent = errorMessage;
-      errorMessageNode.classList.remove('hidden');
+  var clickHandler = function (callback) {
+    console.log(callback)
+    if (!checkCallback(callback)) {
+      return false;
     }
-    window.addEventListener('click', addHiddenClassErrorMessage);
+    return function (event) {
+      callback(event);
+    };
   };
 
-  var addHiddenClassErrorMessage = function () {
-    var errorMessageNode = document.querySelector('.ajax-error-message');
-    errorMessageNode.classList.add('hidden');
-    window.removeEventListener('click', addHiddenClassErrorMessage);
+  /**
+   * Обработчик события нажатия Enter
+   * @param {function} callback - callback-функция
+   * @return {*} - iife функция, запускающая callback функцию
+   */
+  var enterPressHandler = function (callback) {
+    console.log(callback)
+    if (!checkCallback(callback)) {
+      return false;
+    }
+    return function (event) {
+      if (event.keyCode === ENTER_KEYCODE) {
+        callback(event);
+      }
+    };
+  };
+
+  /**
+   * Обработчик события нажатия Esc
+   * @param {function} callback - callback-функция
+   * @return {*} - iife функция, запускающая callback функцию
+   */
+  var escPressHandler = function (callback) {
+    if (!checkCallback(callback)) {
+      return false;
+    }
+    return function (event) {
+      if (event.keyCode === ESC_KEYCODE) {
+        callback(event);
+      }
+    };
+  };
+  // function escPressHandler(callback) {
+  //   if (!checkCallback(callback)) {
+  //     return false;
+  //   }
+  //   if (escPressHandler.handlers.indexOf(callback) === -1) {
+  //     escPressHandler.handlers.push(callback);
+  //   }
+  //   return function (event) {
+  //     if (event.keyCode === ESC_KEYCODE) {
+  //       escPressHandler.handlers.forEach(function (item) {
+  //         item();
+  //       });
+  //     }
+  //   };
+  // }
+  // escPressHandler.handlers = [];
+
+  /**
+   * Проверка callback на тип: функция или нет
+   * @param {function} callback - функция, которую надо проверить
+   * @return {boolean} - результат: true - функция, иначе false
+   */
+  var checkCallback = function (callback) {
+    var res = false;
+    if (typeof callback !== 'function') {
+      throw new Error(callback + ' не функция');
+    } else {
+      res = true;
+    }
+    return res;
   };
 
   return {
-    getAnyElement: getAnyElement,
-    getRandomNumber: getRandomNumber,
-    getSubArray: getSubArray,
     getSelfOrParentByClass: getSelfOrParentByClass,
     checkPointPosition: checkPointPosition,
-    AJAXErrorHandler: AJAXErrorHandler
+    clickHandler: clickHandler,
+    enterPressHandler: enterPressHandler,
+    escPressHandler: escPressHandler,
+    checkCallback: checkCallback
   };
 })();

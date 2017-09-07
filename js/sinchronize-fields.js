@@ -8,8 +8,10 @@ window.sinchronizeFields = (function () {
    * @param {function} callback - функция сравнения элементов
    */
   window.synchronizeFields = function (masterElement, slaveElement, callback) {
-    masterElement.addEventListener('change', function () {
-      callback(masterElement, slaveElement);
-    });
+    if (window.utils.checkCallback(callback)) {
+      masterElement.addEventListener('change', function () {
+        callback(masterElement, slaveElement);
+      });
+    }
   };
 })();
