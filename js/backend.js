@@ -3,7 +3,7 @@
 // Модуль для работы с сервером
 window.backend = (function () {
   var SERVER_URL = 'https://1510.dump.academy/keksobooking';
-  var TIMEOUT = 10000;
+  var TIMEOUT = 15000;
   var RESPONSE_TYPE = 'json';
   var errorMessageNode = null;
 

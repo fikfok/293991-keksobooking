@@ -5,7 +5,6 @@ window.pin = (function () {
   var tokyoBlock = document.querySelector('.tokyo');
   var offerDialog = tokyoBlock.querySelector('#offer-dialog');
   var pinMap = tokyoBlock.querySelector('.tokyo__pin-map');
-  var clickedPin = null;
   var collectionOfPins = null;
   var pinSize = {
     width: 56,
@@ -62,7 +61,7 @@ window.pin = (function () {
    * @param {object} evt - данные о событии
    */
   var activatePin = function (evt) {
-    clickedPin = window.utils.getSelfOrParentByClass(evt.target, 'pin');
+    var clickedPin = window.utils.getSelfOrParentByClass(evt.target, 'pin');
     // Наличие в if'е clickedPin необходимо на тот случай, если pin__main подвести под обычный pin и отпустить,
     // то target'ом будет сама карта и при отработки этой функции
     // возникнет ошибка и неправильное присвоение класса pin--active

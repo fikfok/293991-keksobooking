@@ -2,7 +2,6 @@
 
 window.map = (function () {
   var tokyoBlock = document.querySelector('.tokyo');
-  var offerDialog = tokyoBlock.querySelector('#offer-dialog');
   var tokyoFilterContainer = tokyoBlock.querySelector('.tokyo__filters-container');
   var pinMain = tokyoBlock.querySelector('.pin__main');
   var inputOfferAddress = document.getElementById('address');
@@ -11,7 +10,7 @@ window.map = (function () {
     height: 94
   };
   var mapRegion = {
-    xMin: 0 - pinMainSize.width / 2,
+    xMin: pinMainSize.width / -2,
     xMax: tokyoBlock.getBoundingClientRect().width - pinMainSize.width / 2,
     yMin: 200 - pinMainSize.height,
     yMax: tokyoBlock.getBoundingClientRect().height - pinMainSize.height - tokyoFilterContainer.offsetHeight
@@ -29,8 +28,7 @@ window.map = (function () {
       y: evtDown.clientY
     };
 
-    var trueX = null;
-    var trueY = null;
+    var callbackWithoutParams = true;
     var pointPosition = {
       x: null,
       y: null
@@ -61,13 +59,8 @@ window.map = (function () {
       pointPosition = window.utils.checkPointPosition(mapRegion, pointPosition);
 
       pinMain.style.left = pointPosition.x + 'px';
-      pinMain.style.top = pointPosition.y + 'px';      pinMain.style.left = pointPosition.x + 'px';
       pinMain.style.top = pointPosition.y + 'px';
 
-      trueX = Math.floor(pointPosition.x + pinMainSize.width / 2);
-      trueY = Math.floor(pointPosition.y + pinMainSize.height);
-
-      inputOfferAddress.value = 'x: ' + trueX + ', ' + 'y: ' + trueY;
     };
 
     /**
@@ -78,10 +71,15 @@ window.map = (function () {
       evtUp.preventDefault();
 
       document.removeEventListener('mousemove', mouseMoveHandler);
+      // Чтобы была возможность удалить обработчик движения мыши на документе, который синхронизирует положение главного пина и
+      // поля с адресом, необходимол было доработать синхронизатор контролов и добавить параметр callbackWithoutParams.
+      // Цель: вызывать callback самостоятельно, а не внутри безымянной функции
+      document.removeEventListener('mousemove', window.form.pinMainAddressSync);
       document.removeEventListener('mouseup', mouseUpHandler);
     };
 
     document.addEventListener('mousemove', mouseMoveHandler);
+    window.synchronizeFields('mousemove', document, null, window.form.pinMainAddressSync, callbackWithoutParams);
     document.addEventListener('mouseup', mouseUpHandler);
   });
 
@@ -89,6 +87,7 @@ window.map = (function () {
     if (Object.prototype.toString.call(data) === '[object Array]') {
       window.arrayOfAds = data;
       window.pin.showPins(window.arrayOfAds);
+      // Этот вызов деактивирует активный пин
       window.card.closeOffer();
     } else {
       throw new Error('Полученный ответ от сервера не является массивом');
@@ -97,9 +96,9 @@ window.map = (function () {
 
   // Генерирую и отрисовываю html-фрагмент на основе массива объявлений
   window.backend.load(getData, window.backend.showRequestError);
+  // А этот вызов закрывает диалоговое окно с детальным описанием
   window.card.closeOffer();
 
   tokyoBlock.style.overflow = 'hidden';
-  inputOfferAddress.value = 'x: ' + (pinMain.offsetLeft + pinMainSize.width / 2) + ', ' + 'y: ' + (pinMain.offsetTop + pinMainSize.height);
 
 })();

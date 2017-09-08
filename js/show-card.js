@@ -44,6 +44,16 @@ window.showCard = (function () {
   };
 
   /**
+   * Изменяю аватар в окне с детальным описанием объявления
+   * @param {object} offerDialog - диалоговая панель, в которую будут записываться детальные данные
+   * @param {string} avatarPath - путь к аватару
+   */
+  var changeAvatarInDialog = function (offerDialog, avatarPath) {
+    var offerDialogAvatar = offerDialog.querySelector('.dialog__title img');
+    offerDialogAvatar.src = avatarPath;
+  };
+
+  /**
    * Отрисовываю конкретное объявление в детальном виде
    * @param {object} someArray - массив объявлений
    * @param {integer} numberOfCurrentAd - номер объявления, которое надо отрисовать в детальном виде
@@ -53,9 +63,6 @@ window.showCard = (function () {
     var detailViewPanel = offerDialog.querySelector('.dialog__panel');
 
     detailViewPanel.parentElement.replaceChild(createNodeWithDetailInfo(someArray[numberOfCurrentAd]), detailViewPanel);
-
-    // Меняю аватар в блоке с детальным описанием объявления
-    var offerDialogAvatar = offerDialog.querySelector('.dialog__title img');
-    offerDialogAvatar.src = someArray[numberOfCurrentAd].author.avatar;
+    changeAvatarInDialog(offerDialog, someArray[numberOfCurrentAd].author.avatar);
   };
 })();

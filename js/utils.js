@@ -30,16 +30,15 @@ window.utils = (function () {
   var checkPointPosition = function (rectangleRegion, pointPosition) {
     var x = pointPosition.x;
     var y = pointPosition.y;
-
-    if (pointPosition.x < rectangleRegion.xMin) {
+    if (pointPosition.x <= rectangleRegion.xMin) {
       x = rectangleRegion.xMin;
-    } else if (pointPosition.x > rectangleRegion.xMax) {
+    } else if (pointPosition.x >= rectangleRegion.xMax) {
       x = rectangleRegion.xMax;
     }
 
-    if (pointPosition.y < rectangleRegion.yMin) {
+    if (pointPosition.y <= rectangleRegion.yMin) {
       y = rectangleRegion.yMin;
-    } else if (pointPosition.y > rectangleRegion.yMax) {
+    } else if (pointPosition.y >= rectangleRegion.yMax) {
       y = rectangleRegion.yMax;
     }
     return {x: x, y: y};
@@ -90,22 +89,6 @@ window.utils = (function () {
       }
     };
   };
-  // function escPressHandler(callback) {
-  //   if (!checkCallback(callback)) {
-  //     return false;
-  //   }
-  //   if (escPressHandler.handlers.indexOf(callback) === -1) {
-  //     escPressHandler.handlers.push(callback);
-  //   }
-  //   return function (event) {
-  //     if (event.keyCode === ESC_KEYCODE) {
-  //       escPressHandler.handlers.forEach(function (item) {
-  //         item();
-  //       });
-  //     }
-  //   };
-  // }
-  // escPressHandler.handlers = [];
 
   /**
    * Проверка callback на тип: функция или нет
