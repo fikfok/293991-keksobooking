@@ -7,6 +7,7 @@ window.form = (function () {
   var FLAT_MIN_PRICE_PRE_NIGHT = 1000;
   var HOUSE_MIN_PRICE_PRE_NIGHT = 5000;
   var PALACE_MIN_PRICE_PRE_NIGHT = 10000;
+  var MAX_PRICE_PRE_NIGHT = 1000000;
   var newOfferForm = document.querySelector('form.notice__form');
   var formIsOk = true;
   var tokyoBlock = document.querySelector('.tokyo');
@@ -251,6 +252,8 @@ window.form = (function () {
     var minPrice = getAppartPrice(newOfferForm.type.value);
     if (event.target.value < minPrice) {
       event.target.value = minPrice;
+    } else if (event.target.value >= MAX_PRICE_PRE_NIGHT) {
+      event.target.value = MAX_PRICE_PRE_NIGHT;
     }
   };
 
