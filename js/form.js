@@ -8,14 +8,6 @@ window.form = (function () {
   var HOUSE_MIN_PRICE_PRE_NIGHT = 5000;
   var PALACE_MIN_PRICE_PRE_NIGHT = 10000;
   var newOfferForm = document.querySelector('form.notice__form');
-  var offerTitle = newOfferForm.querySelector('input[type="text"][name="title"]');
-  var inputAddress = newOfferForm.querySelector('#address');
-  var selectApartType = newOfferForm.querySelector('select#type');
-  var inputPriceForNight = newOfferForm.querySelector('input#price');
-  var selectRoomNumber = newOfferForm.querySelector('select#room_number');
-  var selectCapacity = newOfferForm.querySelector('select#capacity');
-  var selectTimeIn = newOfferForm.querySelector('select#timein');
-  var selectTimeOut = newOfferForm.querySelector('select#timeout');
   var formIsOk = true;
   var tokyoBlock = document.querySelector('.tokyo');
   var tokyoFilterContainer = tokyoBlock.querySelector('.tokyo__filters-container');
@@ -24,8 +16,13 @@ window.form = (function () {
     width: 74,
     height: 94
   };
+  var pinMainStartPosition = {
+    x: pinMain.offsetLeft,
+    y: pinMain.offsetTop
+  };
+
   var mapRegion = {
-    xMin: 0 - pinMainSize.width / 2,
+    xMin: pinMainSize.width / -2,
     xMax: tokyoBlock.getBoundingClientRect().width,
     yMin: 200,
     yMax: tokyoBlock.getBoundingClientRect().height - tokyoFilterContainer.offsetHeight
@@ -48,10 +45,10 @@ window.form = (function () {
    * Обработчик события потери фокуса на элементе
    * @param {object} event - данные о событии
    */
-  function inputBlurHandler(event) {
+  var inputBlurHandler = function (event) {
     event.target.removeEventListener('input', inputEnteringHandler);
     event.target.removeEventListener('blur', inputBlurHandler);
-  }
+  };
 
   /**
    * Отметка некорректного поля на форме
@@ -95,7 +92,7 @@ window.form = (function () {
           }
         } else if (elementsInForm[i].type.toLowerCase() === 'number') {
 
-          if (elementsInForm[i].value < getAppartPrice(selectApartType.value) || elementsInForm[i].value > 1000000 || elementsInForm[i].value.length === 0) {
+          if (elementsInForm[i].value < getAppartPrice(newOfferForm.type.value) || elementsInForm[i].value > 1000000 || elementsInForm[i].value.length === 0) {
             formIsOk = false;
             showIncorrectElement(elementsInForm[i]);
           }
@@ -104,8 +101,12 @@ window.form = (function () {
     }
 
     if (formIsOk) {
-      newOfferForm.submit();
-      newOfferForm.reset();
+      window.backend.save(new FormData(newOfferForm), function () {
+        newOfferForm.reset();
+        resetFormToDefault();
+      },
+      window.backend.showRequestError
+      );
     }
   };
 
@@ -114,7 +115,7 @@ window.form = (function () {
    * @param {object} elementTimeIn - список со временем заезда
    * @param {object} elementTimeOut - список со временем выезда
    */
-  var timeSinc = function (elementTimeIn, elementTimeOut) {
+  var timeSync = function (elementTimeIn, elementTimeOut) {
     elementTimeOut.value = elementTimeIn.value;
   };
 
@@ -123,9 +124,17 @@ window.form = (function () {
    * @param {object} elementApartType - выпадающий список с типом жилья
    * @param {object} elementPrice - числовое поле с ценой за ночь
    */
-  var appartPriceSinc = function (elementApartType, elementPrice) {
-    // elementPrice.min = getAppartPrice(elementApartType.value);
+  var appartPriceSync = function (elementApartType, elementPrice) {
     elementPrice.value = getAppartPrice(elementApartType.value);
+  };
+
+  /**
+   * Синхронизация адреса в контроле с положением главного пина
+   */
+  var pinMainAddressSync = function () {
+    // Атрибуты pinMain.style.left и pinMain.style.top отличаются от pinMain.offsetLeft и pinMain.offsetTop. Применяю первый вариант,
+    // т.к. расчёт границ адаптировано к этим координатам
+    newOfferForm.address.value = 'x: ' + Math.floor((parseInt(pinMain.style.left, 10) + pinMainSize.width / 2)) + ', ' + 'y: ' + Math.floor((parseInt(pinMain.style.top, 10) + pinMainSize.height));
   };
 
   /**
@@ -133,7 +142,7 @@ window.form = (function () {
    * @param {object} elementRoomsNumber - выпадающий список с количеством комнат
    * @param {object} elementCapacity - выпадающий список с количеством гостей
    */
-  var roomNumberCapacitySinc = function (elementRoomsNumber, elementCapacity) {
+  var roomNumberCapacitySync = function (elementRoomsNumber, elementCapacity) {
     var currentRooms = null;
     var currentCapacity = null;
     var options1 = elementRoomsNumber.options;
@@ -162,39 +171,21 @@ window.form = (function () {
 
   /**
    * Имитация нажатия на типе жилья, чтобы сгенерировать предлагаемую цену за ночь
+   * @param {string} eventType - тип события
    * @param {object} element - элемент, на котором иммитирую выбор нового значения
    */
-  var simulateChangeEventOnSelect = function (element) {
-    var evt = new Event('change');
+  var simulateChangeEventOnSelect = function (eventType, element) {
+    var evt = new Event(eventType);
     element.options[0].selected = true;
     element.dispatchEvent(evt);
   };
 
   /**
-   * Обработчик ввода данных в поле адресса
-   * @param {object} evt - данные о событии
-   */
-  var addressEnteringHandler = function (evt) {
-    formIsOk = true;
-    checkAddress(evt.target);
-    evt.target.removeEventListener('input', addressEnteringHandler);
-  };
-
-  /**
-   * Обработчик потери фокуса с поля адреса
-   * @param {object} evt - данные о событии
-   */
-  var addressBlurHandler = function (evt) {
-    formIsOk = true;
-    checkAddress(evt.target);
-    evt.target.removeEventListener('blur', addressBlurHandler);
-  };
-
-  /**
-   * Проверка введённого адреса
+   * Функция проверки и синхронизации введённого адреса и положения главного пина
    * @param {object} address - поле с введённым адресом
+   * @param {object} pin - главный пин. Задействуется только при синхронизации. При проверке формы не задаётся и не используется
    */
-  var checkAddress = function (address) {
+  var checkAddress = function (address, pin) {
     var enteredCoords = {
       x: null,
       y: null
@@ -203,18 +194,19 @@ window.form = (function () {
       x: null,
       y: null
     };
-
     var usersAddress = address.value.match(/^x:\s(\d{1,4}),\sy:\s(\d{1,3})$/i);
     if (usersAddress) {
       // Адрес соответствует формату. Но этого мало, надо проверить попадает ли точка в область карты
       address.style.borderColor = '';
-      enteredCoords.x = usersAddress[1];
-      enteredCoords.y = usersAddress[2];
+      enteredCoords.x = +usersAddress[1];
+      enteredCoords.y = +usersAddress[2];
       checkedCoords = window.utils.checkPointPosition(mapRegion, enteredCoords);
       if (enteredCoords.x === checkedCoords.x && enteredCoords.y === checkedCoords.y) {
-        // Точка попала в область карты. Изменяю положение пин-флажка
-        pinMain.style.left = enteredCoords.x - pinMainSize.width / 2 + 'px';
-        pinMain.style.top = enteredCoords.y - pinMainSize.height + 'px';
+        if (pin) {
+          // Точка попала в область карты. Изменяю положение пин-флажка
+          pinMain.style.left = enteredCoords.x - pinMainSize.width / 2 + 'px';
+          pinMain.style.top = enteredCoords.y - pinMainSize.height + 'px';
+        }
       } else {
         // Точка вне области карты
         formIsOk = false;
@@ -251,22 +243,51 @@ window.form = (function () {
     return result;
   };
 
-  offerTitle.removeAttribute('minLength');
-  offerTitle.removeAttribute('maxLength');
-  offerTitle.removeAttribute('required');
-
-  window.synchronizeFields(selectApartType, inputPriceForNight, appartPriceSinc);
-  simulateChangeEventOnSelect(selectApartType);
-  window.synchronizeFields(selectTimeIn, selectTimeOut, timeSinc);
-  window.synchronizeFields(selectTimeOut, selectTimeIn, timeSinc);
-  window.synchronizeFields(selectRoomNumber, selectCapacity, roomNumberCapacitySinc);
-  simulateChangeEventOnSelect(selectRoomNumber);
-
-  inputAddress.addEventListener('input', function (evt) {
-    if (inputAddress.value.length > 0) {
-      addressEnteringHandler(evt);
+  /**
+   * Проверка цены на ввод: если введено меньше минимума, то оставлять минимум
+   * @param {object} event - данные о событии
+   */
+  var changePriceHandler = function (event) {
+    var minPrice = getAppartPrice(newOfferForm.type.value);
+    if (event.target.value < minPrice) {
+      event.target.value = minPrice;
     }
-  });
-  inputAddress.addEventListener('blur', addressBlurHandler);
+  };
+
+  /**
+   * Сброс формы в первоначальное состояние
+   */
+  var resetFormToDefault = function () {
+    simulateChangeEventOnSelect('change', newOfferForm.type);
+    simulateChangeEventOnSelect('change', newOfferForm.rooms);
+    simulateChangeEventOnSelect('change', newOfferForm.timein);
+    pinMain.style.left = pinMainStartPosition.x + 'px';
+    pinMain.style.top = pinMainStartPosition.y + 'px';
+    pinMainAddressSync();
+  };
+
+  /**
+   * Синхронизация всего и сразу
+   */
+  var initialSync = function () {
+    var callbackWithoutParams = false;
+    window.synchronizeFields('change', newOfferForm.type, newOfferForm.price, appartPriceSync, callbackWithoutParams);
+    window.synchronizeFields('change', newOfferForm.timein, newOfferForm.timeout, timeSync, callbackWithoutParams);
+    window.synchronizeFields('change', newOfferForm.timeout, newOfferForm.timein, timeSync, callbackWithoutParams);
+    window.synchronizeFields('change', newOfferForm.rooms, newOfferForm.capacity, roomNumberCapacitySync, callbackWithoutParams);
+    resetFormToDefault();
+    window.synchronizeFields('input', newOfferForm.address, pinMain, checkAddress, callbackWithoutParams);
+  };
+
+  newOfferForm.title.removeAttribute('minLength');
+  newOfferForm.title.removeAttribute('maxLength');
+  newOfferForm.title.removeAttribute('required');
+
+  initialSync();
+
   newOfferForm.addEventListener('submit', submitFormHandler);
+  newOfferForm.price.addEventListener('change', changePriceHandler);
+  return {
+    pinMainAddressSync: pinMainAddressSync
+  };
 })();

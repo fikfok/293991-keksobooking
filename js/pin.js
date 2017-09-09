@@ -5,14 +5,11 @@ window.pin = (function () {
   var tokyoBlock = document.querySelector('.tokyo');
   var offerDialog = tokyoBlock.querySelector('#offer-dialog');
   var pinMap = tokyoBlock.querySelector('.tokyo__pin-map');
-  var clickedPin = null;
   var collectionOfPins = null;
   var pinSize = {
     width: 56,
     height: 75
   };
-  var ENTER_KEYCODE = 13;
-
 
   /**
    * Создание div-блока для нового флажка
@@ -26,8 +23,8 @@ window.pin = (function () {
     if (isPinActive) {
       newDiv.classList.add('pin--active');
     }
-    newDiv.style.left = (singleAd.location.x + pinSize.width / 2) + 'px';
-    newDiv.style.top = (singleAd.location.y + pinSize.height) + 'px';
+    newDiv.style.left = (singleAd.location.x - pinSize.width / 2) + 'px';
+    newDiv.style.top = (singleAd.location.y - pinSize.height) + 'px';
     newDiv.dataset.id = singleAd.author.avatar + '_' + singleAd.location.x + '_' + singleAd.location.y;
     newDiv.tabIndex = 0;
 
@@ -46,7 +43,7 @@ window.pin = (function () {
    * @param {object} someArray - массив объявлений
    * @param {object} pin - размеры пин-флажка
    */
-  var generateAndShowPinsOfAds = function (someArray) {
+  var showPins = function (someArray) {
     var someFragment = document.createDocumentFragment();
     var arrayLength = someArray.length;
     var isPinActive = false;
@@ -56,17 +53,19 @@ window.pin = (function () {
     }
     // Отрисовываю сгенерированные объявления на карте
     pinMap.appendChild(someFragment);
-    collectionOfPins = pinMap.querySelectorAll('div[data-id^="img/avatars/user"]');
+    collectionOfPins = pinMap.querySelectorAll('div[data-id^="img/avatars/"]');
   };
 
   /**
    * Обработчик события нажатия на пин-флажок. Отслеживается клик мыши и нажатие Enter
    * @param {object} evt - данные о событии
    */
-  var pinClickHandler = function (evt) {
-    clickedPin = window.utils.getSelfOrParentByClass(evt.target, 'pin');
-
-    if (!clickedPin.classList.contains('pin__main')) {
+  var activatePin = function (evt) {
+    var clickedPin = window.utils.getSelfOrParentByClass(evt.target, 'pin');
+    // Наличие в if'е clickedPin необходимо на тот случай, если pin__main подвести под обычный pin и отпустить,
+    // то target'ом будет сама карта и при отработки этой функции
+    // возникнет ошибка и неправильное присвоение класса pin--active
+    if (clickedPin && !clickedPin.classList.contains('pin__main')) {
       var childrenNumber = clickedPin.parentElement.children.length;
       for (var i = 0; i < childrenNumber; i++) {
         if (clickedPin.parentElement.children[i].classList.contains('pin--active')) {
@@ -74,27 +73,15 @@ window.pin = (function () {
         }
       }
       clickedPin.classList.add('pin--active');
-      window.showDetailOffer(window.data.arrayOfAds, Array.prototype.indexOf.call(collectionOfPins, clickedPin), offerDialog);
+      window.showDetailOffer(window.arrayOfAds, Array.prototype.indexOf.call(collectionOfPins, clickedPin), offerDialog);
       offerDialog.classList.remove('hidden');
-      window.addEventListener('keydown', window.card.closeOfferClickHandlerEscPress);
     }
   };
 
-  pinMap.addEventListener('click', function (evt) {
-    // Эта проверка нужна для того, что бы не было ошибки, когда pin__main подвести под обычный pin и отпустить
-    // В таком случае target'ом будет сама карта и при отработки функции pinClickHandler возникнет ошибка и неправильное присвоение класса pin--active
-    if (window.utils.getSelfOrParentByClass(evt.target, 'pin')) {
-      pinClickHandler(evt);
-    }
-  });
-
-  pinMap.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      pinClickHandler(evt);
-    }
-  });
+  pinMap.addEventListener('click', window.utils.clickHandler(activatePin));
+  pinMap.addEventListener('keydown', window.utils.enterPressHandler(activatePin));
 
   return {
-    generateAndShowPinsOfAds: generateAndShowPinsOfAds
+    showPins: showPins
   };
 })();

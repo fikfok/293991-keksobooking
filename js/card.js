@@ -5,32 +5,25 @@ window.card = (function () {
   var offerDialog = document.getElementById('offer-dialog');
   var buttonCloseOffer = offerDialog.querySelector('.dialog__close');
   var pinMap = document.querySelector('.tokyo__pin-map');
-  var ESC_KEYCODE = 27;
 
   /**
    * Обработчик события нажатия на крестик закрытия окна оффера. Отслеживается клик мыши и нажатие Esc
    * @param {object} evt - данные о событии
    */
-  var closeOfferClickHandler = function () {
-    offerDialog.classList.add('hidden');
-    pinMap.querySelector('.pin--active').classList.remove('pin--active');
-    window.removeEventListener('keydown', closeOfferClickHandlerEscPress);
-  };
-
-  /**
-   * Обработчик события нажатия Esc
-   * @param {object} evt - данные о событии
-   */
-  var closeOfferClickHandlerEscPress = function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      closeOfferClickHandler();
+  var closeOffer = function () {
+    if (!offerDialog.classList.contains('hidden')) {
+      offerDialog.classList.add('hidden');
+    }
+    var activePin = pinMap.querySelector('.pin--active');
+    if (activePin) {
+      activePin.classList.remove('pin--active');
     }
   };
 
-  buttonCloseOffer.addEventListener('click', closeOfferClickHandler);
-  window.addEventListener('keydown', closeOfferClickHandlerEscPress);
+  buttonCloseOffer.addEventListener('click', window.utils.clickHandler(closeOffer));
+  window.addEventListener('keydown', window.utils.escPressHandler(closeOffer));
 
   return {
-    closeOfferClickHandlerEscPress: closeOfferClickHandlerEscPress
+    closeOffer: closeOffer
   };
 })();
