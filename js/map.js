@@ -86,9 +86,8 @@ window.map = (function () {
   var getData = function (data) {
     if (Object.prototype.toString.call(data) === '[object Array]') {
       window.arrayOfAds = data;
+      window.filteredAds = window.arrayOfAds;
       window.pin.showPins(window.arrayOfAds);
-      // Этот вызов деактивирует активный пин
-      window.card.closeOffer();
     } else {
       throw new Error('Полученный ответ от сервера не является массивом');
     }
@@ -96,8 +95,6 @@ window.map = (function () {
 
   // Генерирую и отрисовываю html-фрагмент на основе массива объявлений
   window.backend.load(getData, window.backend.showRequestError);
-  // А этот вызов закрывает диалоговое окно с детальным описанием
-  window.card.closeOffer();
 
   tokyoBlock.style.overflow = 'hidden';
 
