@@ -102,12 +102,16 @@ window.form = (function () {
     });
 
     if (formIsOk) {
-      window.backend.save(new FormData(newOfferForm), function () {
-        newOfferForm.reset();
-        resetFormToDefault();
-      }, window.backend.showRequestError
-      );
+      window.backend.save(new FormData(newOfferForm), doSuccessOnSave, window.backend.showRequestError);
     }
+  };
+
+  /**
+   * Функция отрабатывающая в случае успешного выполнения xhr запроса
+   */
+  var doSuccessOnSave = function () {
+    newOfferForm.reset();
+    resetFormToDefault();
   };
 
   /**
