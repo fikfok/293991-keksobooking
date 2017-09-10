@@ -106,7 +106,7 @@ window.form = (function () {
         newOfferForm.reset();
         resetFormToDefault();
       },
-      window.backend.showRequestError
+          window.backend.showRequestError
       );
     }
   };
