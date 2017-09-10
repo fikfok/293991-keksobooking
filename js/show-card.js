@@ -2,7 +2,7 @@
 
 // Модуль для отрисовки объявления в детальном блоке
 window.showCard = (function () {
-  var templateOffer = document.getElementById('lodge-template').content;
+  var templateOffer = document.querySelector('#lodge-template').content;
 
   /**
    * На основе шаблона генерирую новый узел с детальным описанием первого объявления
@@ -33,13 +33,12 @@ window.showCard = (function () {
     newElement.querySelector('.lodge__description').textContent = singleAd.description;
 
     // В цикле генерирую span-элементы обозначающие доп. опции жилища
-    var featuresNumber = singleAd.offer.features.length;
-    for (var i = 0; i < featuresNumber; i++) {
+    singleAd.offer.features.forEach(function (item) {
       var newSpan = document.createElement('span');
       newSpan.classList.add('feature__image');
-      newSpan.classList.add('feature__image--' + singleAd.offer.features[i]);
+      newSpan.classList.add('feature__image--' + item);
       newElement.querySelector('.lodge__features').appendChild(newSpan);
-    }
+    });
     return newElement;
   };
 

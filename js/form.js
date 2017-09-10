@@ -8,6 +8,8 @@ window.form = (function () {
   var HOUSE_MIN_PRICE_PRE_NIGHT = 5000;
   var PALACE_MIN_PRICE_PRE_NIGHT = 10000;
   var MAX_PRICE_PRE_NIGHT = 1000000;
+  var TITLE_MIN_LENGTH = 30;
+  var TITLE_MAX_LENGTH = 100;
   var newOfferForm = document.querySelector('form.notice__form');
   var formIsOk = true;
   var tokyoBlock = document.querySelector('.tokyo');
@@ -76,30 +78,28 @@ window.form = (function () {
   var submitFormHandler = function (event) {
     event.preventDefault();
     var elementsInForm = newOfferForm.elements;
-    var fieldsNumber = elementsInForm.length;
 
-    for (var i = 0; i < fieldsNumber; i++) {
+    Array.prototype.forEach.call(elementsInForm, function (element) {
       // Проверка текстовых полей
-      if (elementsInForm[i].tagName.toLowerCase() === 'input') {
-        elementsInForm[i].style.borderColor = '';
-        if (elementsInForm[i].type.toLowerCase() === 'text') {
-          if (elementsInForm[i].name.toLowerCase() === 'title') {
-            if (elementsInForm[i].value.length < 30 || elementsInForm[i].value.length > 100) {
+      if (element.tagName.toLowerCase() === 'input') {
+        element.style.borderColor = '';
+        if (element.type.toLowerCase() === 'text') {
+          if (element.name.toLowerCase() === 'title') {
+            if (element.value.length < TITLE_MIN_LENGTH || element.value.length > TITLE_MAX_LENGTH) {
               formIsOk = false;
-              showIncorrectElement(elementsInForm[i]);
+              showIncorrectElement(element);
             }
-          } else if (elementsInForm[i].name.toLowerCase() === 'address') {
-            checkAddress(elementsInForm[i]);
+          } else if (element.name.toLowerCase() === 'address') {
+            checkAddress(element);
           }
-        } else if (elementsInForm[i].type.toLowerCase() === 'number') {
-
-          if (elementsInForm[i].value < getAppartPrice(newOfferForm.type.value) || elementsInForm[i].value > 1000000 || elementsInForm[i].value.length === 0) {
+        } else if (element.type.toLowerCase() === 'number') {
+          if (element.value < getAppartPrice(newOfferForm.type.value) || element.value > MAX_PRICE_PRE_NIGHT || element.value.length === 0) {
             formIsOk = false;
-            showIncorrectElement(elementsInForm[i]);
+            showIncorrectElement(element);
           }
         }
       }
-    }
+    });
 
     if (formIsOk) {
       window.backend.save(new FormData(newOfferForm), function () {
@@ -148,26 +148,27 @@ window.form = (function () {
     var currentCapacity = null;
     var options1 = elementRoomsNumber.options;
     var options2 = elementCapacity.options;
-    for (var i = 0; i < options1.length; i++) {
-      if (options1[i].selected) {
-        currentRooms = +options1[i].value;
-      }
-    }
 
-    for (i = 0; i < options2.length; i++) {
-      currentCapacity = +options2[i].value;
-      options2[i].disabled = false;
+    Array.prototype.forEach.call(options1, function (singleOption) {
+      if (singleOption.selected) {
+        currentRooms = +singleOption.value;
+      }
+    });
+
+    Array.prototype.forEach.call(options2, function (singleOption) {
+      currentCapacity = +singleOption.value;
+      singleOption.disabled = false;
 
       if (currentRooms === 100 && currentCapacity === 0) {
-        options2[i].selected = true;
+        singleOption.selected = true;
       } else if (currentRooms === currentCapacity) {
-        options2[i].selected = true;
+        singleOption.selected = true;
       } else {
         if (currentCapacity > currentRooms || currentCapacity === 0 || (currentRooms === 100 && currentCapacity !== 0)) {
-          options2[i].disabled = true;
+          singleOption.disabled = true;
         }
       }
-    }
+    });
   };
 
   /**

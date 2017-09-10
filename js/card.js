@@ -2,7 +2,7 @@
 
 // Модуль для отрисовки объявления в детальном блоке
 window.card = (function () {
-  var offerDialog = document.getElementById('offer-dialog');
+  var offerDialog = document.querySelector('#offer-dialog');
   var buttonCloseOffer = offerDialog.querySelector('.dialog__close');
   var pinMap = document.querySelector('.tokyo__pin-map');
 

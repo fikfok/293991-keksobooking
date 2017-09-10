@@ -4,7 +4,7 @@ window.map = (function () {
   var tokyoBlock = document.querySelector('.tokyo');
   var tokyoFilterContainer = tokyoBlock.querySelector('.tokyo__filters-container');
   var pinMain = tokyoBlock.querySelector('.pin__main');
-  var inputOfferAddress = document.getElementById('address');
+  var inputOfferAddress = document.querySelector('#address');
   var pinMainSize = {
     width: 74,
     height: 94
@@ -83,6 +83,10 @@ window.map = (function () {
     document.addEventListener('mouseup', mouseUpHandler);
   });
 
+  /**
+   * Функция сохранения полученных данных с сервера в xhr запросе и отрисовки полученных объявлений на карте
+   * @param {object} data - массив, полученный от сервера
+   */
   var getData = function (data) {
     if (Object.prototype.toString.call(data) === '[object Array]') {
       window.arrayOfAds = data;
@@ -93,7 +97,7 @@ window.map = (function () {
     }
   };
 
-  // Генерирую и отрисовываю html-фрагмент на основе массива объявлений
+  // Получаю от сервера данные и отрисовываю html-фрагмент на основе массива объявлений
   window.backend.load(getData, window.backend.showRequestError);
 
   tokyoBlock.style.overflow = 'hidden';

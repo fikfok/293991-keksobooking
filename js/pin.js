@@ -116,13 +116,12 @@ window.pin = (function () {
    */
   var showPins = function (someArray) {
     var someFragment = document.createDocumentFragment();
-    var arrayLength = someArray.length;
-    for (var i = 0; i < arrayLength; i++) {
-      someFragment.appendChild(createAnotherDiv(someArray[i]));
-    }
+    someArray.forEach(function (item) {
+      someFragment.appendChild(createAnotherDiv(item));
+    });
 
-    pinMap.querySelectorAll('div[data-id^="img/avatars/"]').forEach(function (item) {
-      item.remove();
+    pinMap.querySelectorAll('div[data-id^="img/avatars/"]').forEach(function (element) {
+      element.remove();
     });
 
     // Закрываю диалоговую панель
@@ -142,12 +141,12 @@ window.pin = (function () {
     // то target'ом будет сама карта и при отработки этой функции
     // возникнет ошибка и неправильное присвоение класса pin--active
     if (clickedPin && !clickedPin.classList.contains('pin__main')) {
-      var childrenNumber = clickedPin.parentElement.children.length;
-      for (var i = 0; i < childrenNumber; i++) {
-        if (clickedPin.parentElement.children[i].classList.contains('pin--active')) {
-          clickedPin.parentElement.children[i].classList.remove('pin--active');
+      Array.prototype.forEach.call(clickedPin.parentElement.children, function (element) {
+        if (element.classList.contains('pin--active')) {
+          element.classList.remove('pin--active');
         }
-      }
+      });
+
       clickedPin.classList.add('pin--active');
       window.showDetailOffer(window.filteredAds, Array.prototype.indexOf.call(collectionOfPins, clickedPin), offerDialog);
       offerDialog.classList.remove('hidden');
@@ -160,17 +159,22 @@ window.pin = (function () {
   var doFilter = function () {
     window.filteredAds = window.arrayOfAds.filter(function (ad) {
       return Object.keys(ad.offer).filter(function (key) {
+        // Из объявления из вложенного offer отбираю только нужные для фильтрация атрибуты
         return filterFields.fields.indexOf(key) >= 0 ? true : false;
       }).map(function (key) {
+        // Трансформирую отобранные атрибуты в объекты типа "название атрибута": "значение"
         var obj = {};
         obj[key] = ad.offer[key];
         return obj;
       }).reduce(function (accumulator, it) {
+        // Формирую массив из объектов
         accumulator.push(it);
         return accumulator;
       }, []).map(function (item) {
+        // Прохожу по массиву и возвращаю для каждого элемента массива результат сравнения: true/false
         return filterFields.compare(Object.keys(item)[0], item[Object.keys(item)[0]]);
       }).reduce(function (accumulator, it) {
+        // Аггрегирую все результаты проверки через AND в одно значение. Оно и будет проверятся в самом верхнем filter
         accumulator = accumulator && it;
         return accumulator;
       });

@@ -12,21 +12,21 @@ window.backend = (function () {
    * @return {object} - html-узел
    */
   var createRequestErrorBlock = function () {
-    var node = document.createElement('div');
-    node.style.zIndex = 100;
-    node.style.marginTop = '250px';
-    node.style.marginLeft = 'auto';
-    node.style.marginRight = 'auto';
-    node.style.width = '1200px';
-    node.style.textAlign = 'center';
-    node.style.backgroundColor = 'red';
-    node.style.position = 'absolute';
-    node.style.left = 0;
-    node.style.right = 0;
-    node.style.fontSize = '30px';
-    node.classList.add('ajax-error-message');
-    document.body.insertAdjacentElement('afterbegin', node);
-    return node;
+    var newElement = document.createElement('div');
+    newElement.style.zIndex = 100;
+    newElement.style.marginTop = '250px';
+    newElement.style.marginLeft = 'auto';
+    newElement.style.marginRight = 'auto';
+    newElement.style.width = '1200px';
+    newElement.style.textAlign = 'center';
+    newElement.style.backgroundColor = 'red';
+    newElement.style.position = 'absolute';
+    newElement.style.left = 0;
+    newElement.style.right = 0;
+    newElement.style.fontSize = '30px';
+    newElement.classList.add('ajax-error-message');
+    document.body.insertAdjacentElement('afterbegin', newElement);
+    return newElement;
   };
 
   /**
