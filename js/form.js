@@ -105,8 +105,7 @@ window.form = (function () {
       window.backend.save(new FormData(newOfferForm), function () {
         newOfferForm.reset();
         resetFormToDefault();
-      },
-          window.backend.showRequestError
+      }, window.backend.showRequestError
       );
     }
   };
