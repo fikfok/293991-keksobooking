@@ -160,17 +160,22 @@ window.pin = (function () {
   var doFilter = function () {
     window.filteredAds = window.arrayOfAds.filter(function (ad) {
       return Object.keys(ad.offer).filter(function (key) {
+        // Из объявления из вложенного offer отбираю только нужные для фильтрация атрибуты
         return filterFields.fields.indexOf(key) >= 0 ? true : false;
       }).map(function (key) {
+        // Трансформирую отобранные атрибуты в объекты типа "название атрибута": "значение"
         var obj = {};
         obj[key] = ad.offer[key];
         return obj;
       }).reduce(function (accumulator, it) {
+        // Формирую массив из объектов
         accumulator.push(it);
         return accumulator;
       }, []).map(function (item) {
+        // Прохожу по массиву и возвращаю для каждого элемента массива результат сравнения: true/false
         return filterFields.compare(Object.keys(item)[0], item[Object.keys(item)[0]]);
       }).reduce(function (accumulator, it) {
+        // Аггрегирую все результаты проверки через AND в одно значение. Оно и будет проверятся в самом верхнем filter
         accumulator = accumulator && it;
         return accumulator;
       });
