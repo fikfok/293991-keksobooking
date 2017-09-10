@@ -4,7 +4,8 @@
 window.utils = (function () {
   var ENTER_KEYCODE = 13;
   var ESC_KEYCODE = 27;
-
+  var DEBOUNCE_INTERVAL = 500;
+  var lastTimeout = null;
   /**
    * Возвращает или сам переданный элемент или его первого родителя, у которого есть переданный класс
    * @param {Object} element - элемент, с которого начинается поиск родителя
@@ -105,12 +106,27 @@ window.utils = (function () {
     return res;
   };
 
+  /**
+   * Функция реализующая задержку для устранения частого нажатия: невыполняет предыдущий вызов функции, если
+   * с предыдущего до повторного вызова прошло менее DEBOUNCE_INTERVAL мс.
+   * @param {function} callback - функция, которую надо выполнить
+   */
+  var debounce = function (callback) {
+    if (checkCallback(callback)) {
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(callback, DEBOUNCE_INTERVAL);
+    }
+  };
+
   return {
     getSelfOrParentByClass: getSelfOrParentByClass,
     checkPointPosition: checkPointPosition,
     clickHandler: clickHandler,
     enterPressHandler: enterPressHandler,
     escPressHandler: escPressHandler,
-    checkCallback: checkCallback
+    checkCallback: checkCallback,
+    debounce: debounce
   };
 })();
