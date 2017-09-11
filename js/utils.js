@@ -54,8 +54,8 @@ window.utils = (function () {
     if (!checkCallback(callback)) {
       return false;
     }
-    return function (event) {
-      callback(event);
+    return function (evt) {
+      callback(evt);
     };
   };
 
@@ -68,9 +68,9 @@ window.utils = (function () {
     if (!checkCallback(callback)) {
       return false;
     }
-    return function (event) {
-      if (event.keyCode === ENTER_KEYCODE) {
-        callback(event);
+    return function (evt) {
+      if (evt.keyCode === ENTER_KEYCODE) {
+        callback(evt);
       }
     };
   };
@@ -84,9 +84,9 @@ window.utils = (function () {
     if (!checkCallback(callback)) {
       return false;
     }
-    return function (event) {
-      if (event.keyCode === ESC_KEYCODE) {
-        callback(event);
+    return function (evt) {
+      if (evt.keyCode === ESC_KEYCODE) {
+        callback(evt);
       }
     };
   };

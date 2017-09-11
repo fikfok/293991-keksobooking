@@ -6,6 +6,7 @@ window.backend = (function () {
   var TIMEOUT = 15000;
   var RESPONSE_TYPE = 'json';
   var errorMessageNode = null;
+  var utils = window.utils;
 
   /**
    * Создание html-узла с сообщением об ошибке в XMLHttpRequest запросе
@@ -37,8 +38,8 @@ window.backend = (function () {
   var showRequestErrorBlock = function (errorMessage) {
     errorMessageNode.textContent = errorMessage;
     errorMessageNode.classList.remove('hidden');
-    window.addEventListener('click', window.utils.clickHandler(closeRequestErrorBlock));
-    window.addEventListener('keydown', window.utils.escPressHandler(closeRequestErrorBlock));
+    window.addEventListener('click', utils.clickHandler(closeRequestErrorBlock));
+    window.addEventListener('keydown', utils.escPressHandler(closeRequestErrorBlock));
   };
 
   /**
@@ -46,8 +47,8 @@ window.backend = (function () {
    */
   var closeRequestErrorBlock = function () {
     errorMessageNode.classList.add('hidden');
-    window.removeEventListener('click', window.utils.clickHandler(closeRequestErrorBlock));
-    window.removeEventListener('keydown', window.utils.escPressHandler(closeRequestErrorBlock));
+    window.removeEventListener('click', utils.clickHandler(closeRequestErrorBlock));
+    window.removeEventListener('keydown', utils.escPressHandler(closeRequestErrorBlock));
   };
 
   /**
@@ -110,7 +111,7 @@ window.backend = (function () {
    * @param {function} onError - функция, выполняемая при ошибке выполенния запрос
    */
   var save = function (data, onLoad, onError) {
-    if (window.utils.checkCallback(onLoad) && window.utils.checkCallback(onError)) {
+    if (utils.checkCallback(onLoad) && utils.checkCallback(onError)) {
       ajax('POST', RESPONSE_TYPE, SERVER_URL, TIMEOUT, onLoad, onError, data);
     }
   };
@@ -121,7 +122,7 @@ window.backend = (function () {
    * @param {function} onError - функция, выполняемая при ошибке выполенния запрос
    */
   var load = function (onLoad, onError) {
-    if (window.utils.checkCallback(onLoad) && window.utils.checkCallback(onError)) {
+    if (utils.checkCallback(onLoad) && utils.checkCallback(onError)) {
       ajax('GET', RESPONSE_TYPE, SERVER_URL + '/data', TIMEOUT, onLoad, onError, null);
     }
   };

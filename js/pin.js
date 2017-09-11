@@ -11,6 +11,8 @@ window.pin = (function () {
     width: 56,
     height: 75
   };
+  var utils = window.utils;
+
   var filterFields = {
     fields: ['type', 'price', 'rooms', 'guests', 'features'],
     /**
@@ -136,7 +138,7 @@ window.pin = (function () {
    * @param {object} evt - данные о событии
    */
   var activatePin = function (evt) {
-    var clickedPin = window.utils.getSelfOrParentByClass(evt.target, 'pin');
+    var clickedPin = utils.getSelfOrParentByClass(evt.target, 'pin');
     // Наличие в if'е clickedPin необходимо на тот случай, если pin__main подвести под обычный pin и отпустить,
     // то target'ом будет сама карта и при отработки этой функции
     // возникнет ошибка и неправильное присвоение класса pin--active
@@ -183,11 +185,11 @@ window.pin = (function () {
     showPins(window.filteredAds);
   };
 
-  pinMap.addEventListener('click', window.utils.clickHandler(activatePin));
-  pinMap.addEventListener('keydown', window.utils.enterPressHandler(activatePin));
+  pinMap.addEventListener('click', utils.clickHandler(activatePin));
+  pinMap.addEventListener('keydown', utils.enterPressHandler(activatePin));
 
   filters.addEventListener('change', function () {
-    window.utils.debounce(doFilter);
+    utils.debounce(doFilter);
   });
 
   return {

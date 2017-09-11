@@ -23,34 +23,34 @@ window.form = (function () {
     x: pinMain.offsetLeft,
     y: pinMain.offsetTop
   };
-
   var mapRegion = {
     xMin: pinMainSize.width / -2,
     xMax: tokyoBlock.getBoundingClientRect().width,
     yMin: 200,
     yMax: tokyoBlock.getBoundingClientRect().height - tokyoFilterContainer.offsetHeight
   };
+  var backend = window.backend;
 
   /**
    * Обработчик события ввода на элементе
-   * @param {object} event - данные о событии
+   * @param {object} evt - данные о событии
    */
-  function inputEnteringHandler(event) {
+  function inputEnteringHandler(evt) {
     if (!formIsOk) {
       formIsOk = true;
-      if (event.target.style.borderColor) {
-        event.target.style.borderColor = '';
+      if (evt.target.style.borderColor) {
+        evt.target.style.borderColor = '';
       }
     }
   }
 
   /**
    * Обработчик события потери фокуса на элементе
-   * @param {object} event - данные о событии
+   * @param {object} evt - данные о событии
    */
-  var inputBlurHandler = function (event) {
-    event.target.removeEventListener('input', inputEnteringHandler);
-    event.target.removeEventListener('blur', inputBlurHandler);
+  var inputBlurHandler = function (evt) {
+    evt.target.removeEventListener('input', inputEnteringHandler);
+    evt.target.removeEventListener('blur', inputBlurHandler);
   };
 
   /**
@@ -73,10 +73,10 @@ window.form = (function () {
 
   /**
    * Обработчик формы
-   * @param {object} event - данные о событии
+   * @param {object} evt - данные о событии
    */
-  var submitFormHandler = function (event) {
-    event.preventDefault();
+  var submitFormHandler = function (evt) {
+    evt.preventDefault();
     var elementsInForm = newOfferForm.elements;
 
     Array.prototype.forEach.call(elementsInForm, function (element) {
@@ -102,7 +102,7 @@ window.form = (function () {
     });
 
     if (formIsOk) {
-      window.backend.save(new FormData(newOfferForm), doSuccessOnSave, window.backend.showRequestError);
+      backend.save(new FormData(newOfferForm), doSuccessOnSave, backend.showRequestError);
     }
   };
 
@@ -250,9 +250,8 @@ window.form = (function () {
 
   /**
    * Проверка цены на ввод: если введено меньше минимума, то оставлять минимум
-   * @param {object} event - данные о событии
    */
-  var changePriceHandler = function (event) {
+  var changePriceHandler = function () {
     var minPrice = getAppartPrice(newOfferForm.type.value);
     if (event.target.value < minPrice) {
       event.target.value = minPrice;

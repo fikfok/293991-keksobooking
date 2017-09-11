@@ -12,7 +12,8 @@ window.showCard = (function () {
   var createNodeWithDetailInfo = function (singleAd) {
     var newElement = templateOffer.cloneNode(true);
     var rusLodgeType = null;
-    switch (singleAd.offer.type) {
+    var offer = singleAd.offer;
+    switch (offer.type) {
       case 'flat':
         rusLodgeType = 'Квартира';
         break;
@@ -24,16 +25,16 @@ window.showCard = (function () {
         break;
     }
     // Заполняю блок данными из объявления
-    newElement.querySelector('.lodge__title').textContent = singleAd.offer.title;
-    newElement.querySelector('.lodge__address').textContent = singleAd.offer.address;
-    newElement.querySelector('.lodge__price').innerHTML = singleAd.offer.price + '&#x20bd;/ночь'; /* Здесь надо применить именно innerHTML, т.к. код символа рубля можно отобразить только так*/
+    newElement.querySelector('.lodge__title').textContent = offer.title;
+    newElement.querySelector('.lodge__address').textContent = offer.address;
+    newElement.querySelector('.lodge__price').innerHTML = offer.price + '&#x20bd;/ночь'; /* Здесь надо применить именно innerHTML, т.к. код символа рубля можно отобразить только так*/
     newElement.querySelector('.lodge__type').textContent = rusLodgeType;
-    newElement.querySelector('.lodge__rooms-and-guests').textContent = 'Для ' + singleAd.offer.guests + ' гостей в ' + singleAd.offer.rooms + ' комнатах';
-    newElement.querySelector('.lodge__checkin-time').textContent = 'Заезд после ' + singleAd.offer.checkin + ', выезд до ' + singleAd.offer.checkout;
+    newElement.querySelector('.lodge__rooms-and-guests').textContent = 'Для ' + offer.guests + ' гостей в ' + offer.rooms + ' комнатах';
+    newElement.querySelector('.lodge__checkin-time').textContent = 'Заезд после ' + offer.checkin + ', выезд до ' + offer.checkout;
     newElement.querySelector('.lodge__description').textContent = singleAd.description;
 
     // В цикле генерирую span-элементы обозначающие доп. опции жилища
-    singleAd.offer.features.forEach(function (item) {
+    offer.features.forEach(function (item) {
       var newSpan = document.createElement('span');
       newSpan.classList.add('feature__image');
       newSpan.classList.add('feature__image--' + item);

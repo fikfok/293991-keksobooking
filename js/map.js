@@ -15,17 +15,18 @@ window.map = (function () {
     yMin: 200 - pinMainSize.height,
     yMax: tokyoBlock.getBoundingClientRect().height - pinMainSize.height - tokyoFilterContainer.offsetHeight
   };
-
+  var backend = window.backend;
+  var form = window.form;
   /**
    * Обработчик нажатия клавиши мыши
-   * @param {object} evtMove - данные о событии
+   * @param {object} evt - данные о событии
    */
-  pinMain.addEventListener('mousedown', function (evtDown) {
-    evtDown.preventDefault();
+  pinMain.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
 
     var coordsStart = {
-      x: evtDown.clientX,
-      y: evtDown.clientY
+      x: evt.clientX,
+      y: evt.clientY
     };
 
     var callbackWithoutParams = true;
@@ -39,6 +40,8 @@ window.map = (function () {
      * @param {object} evtMove - данные о событии
      */
     var mouseMoveHandler = function (evtMove) {
+      // ESLint выдаёт ошибку: 42:38  error  'evt' is already declared in the upper scope  no-shadow
+      // Потому пришлось присвоить название evtMove
       evtMove.preventDefault();
 
       if (inputOfferAddress.style.borderColor) {
@@ -68,18 +71,20 @@ window.map = (function () {
      * @param {object} evtUp - данные о событии
      */
     var mouseUpHandler = function (evtUp) {
+      // ESLint выдаёт ошибку: 71:36  error  'evt' is already declared in the upper scope  no-shadow
+      // Потому пришлось присвоить название evtUp
       evtUp.preventDefault();
 
       document.removeEventListener('mousemove', mouseMoveHandler);
       // Чтобы была возможность удалить обработчик движения мыши на документе, который синхронизирует положение главного пина и
       // поля с адресом, необходимол было доработать синхронизатор контролов и добавить параметр callbackWithoutParams.
       // Цель: вызывать callback самостоятельно, а не внутри безымянной функции
-      document.removeEventListener('mousemove', window.form.pinMainAddressSync);
+      document.removeEventListener('mousemove', form.pinMainAddressSync);
       document.removeEventListener('mouseup', mouseUpHandler);
     };
 
     document.addEventListener('mousemove', mouseMoveHandler);
-    window.synchronizeFields('mousemove', document, null, window.form.pinMainAddressSync, callbackWithoutParams);
+    window.synchronizeFields('mousemove', document, null, form.pinMainAddressSync, callbackWithoutParams);
     document.addEventListener('mouseup', mouseUpHandler);
   });
 
@@ -98,7 +103,7 @@ window.map = (function () {
   };
 
   // Получаю от сервера данные и отрисовываю html-фрагмент на основе массива объявлений
-  window.backend.load(getData, window.backend.showRequestError);
+  backend.load(getData, backend.showRequestError);
 
   tokyoBlock.style.overflow = 'hidden';
 
